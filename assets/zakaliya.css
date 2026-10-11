@@ -33,7 +33,7 @@
     .nav-cta, .button { display: inline-flex; min-height: 50px; align-items: center; justify-content: center; padding: 0 23px; border: 1px solid var(--forest); border-radius: 999px; background: var(--forest); color: white !important; font-size: 11px !important; font-weight: 800 !important; letter-spacing: .11em !important; text-decoration: none !important; text-transform: uppercase; transition: background .18s ease, transform .18s ease; }
     .nav-cta:hover, .button:hover { background: #164b37; transform: translateY(-2px); }
     .menu-toggle { display: none; }
-    .hero { position: relative; overflow: hidden; background-color: var(--forest-deep); background-image: linear-gradient(90deg, rgba(24,50,42,1) 0%, rgba(24,50,42,.98) 31%, rgba(24,50,42,.86) 46%, rgba(24,50,42,.46) 64%, rgba(24,50,42,.02) 82%), url("assets/hope-hero.png"); background-size: 100% 100%, auto 100%; background-position: center, right center; background-repeat: no-repeat; color: var(--paper); }
+    .hero { position: relative; overflow: hidden; background-color: var(--forest-deep); background-image: linear-gradient(90deg, rgba(24,50,42,1) 0%, rgba(24,50,42,.98) 31%, rgba(24,50,42,.86) 46%, rgba(24,50,42,.46) 64%, rgba(24,50,42,.02) 82%), url("hero-kids.jpg"); background-size: 100% 100%, auto 100%; background-position: center, right center; background-repeat: no-repeat; color: var(--paper); }
     .hero::before { position: absolute; inset: 0 auto 0 0; width: 7px; background: var(--ochre); content: ""; }
     .hero-inner { display: flex; min-height: 650px; min-height: min(760px, calc(100svh - 94px)); align-items: center; padding-block: 66px; }
     .hero-copy { position: relative; z-index: 1; width: min(62%, 690px); padding: 20px 0 32px; }
@@ -113,7 +113,7 @@
       .brand-place { font-size: 9px; }
       .nav-links { display: none; }
       .menu-toggle { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; border: 1px solid var(--line); background: transparent; color: var(--forest-deep); font: 700 10px var(--sans); letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
-      .hero { background-image: linear-gradient(180deg, rgba(24,50,42,1) 0%, rgba(24,50,42,.98) 36%, rgba(24,50,42,.88) 52%, rgba(24,50,42,.44) 73%, rgba(24,50,42,.08) 100%), url("assets/hope-hero.png"); background-size: 100% 100%, auto 76%; background-position: center, bottom center; }
+      .hero { background-image: linear-gradient(180deg, rgba(24,50,42,1) 0%, rgba(24,50,42,.98) 36%, rgba(24,50,42,.88) 52%, rgba(24,50,42,.44) 73%, rgba(24,50,42,.08) 100%), url("hero-kids.jpg"); background-size: 100% 100%, 100% auto; background-position: center, bottom center; }
       .hero-inner { min-height: 820px; min-height: min(900px, max(760px, calc(100svh - 76px))); align-items: flex-start; padding-block: 47px 56px; }
       .hero-copy { width: 100%; padding: 0; }
       h1 { max-width: 520px; margin-block: 20px; font-size: clamp(48px, 13vw, 68px); }
