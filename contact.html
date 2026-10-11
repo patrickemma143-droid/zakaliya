@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#18322a">
+  <meta name="description" content="Contact Zakaliya Shared Blessings Ministry by email, phone or message.">
+  <title>Get in touch - Zakaliya Shared Blessings Ministry</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/zakaliya.css?v=16">
+</head>
+<body>
+  <div class="topline" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="index.html" aria-label="Zakaliya Shared Blessings Ministry home"><img class="brand-logo" src="assets/logo.png" alt="" width="96" height="58"><span><span class="brand-name">Zakaliya Shared Blessings Ministry</span><span class="brand-place">Sharing blessings</span></span></a>
+      <nav class="nav-links" aria-label="Main navigation"><a href="index.html">Home</a><a href="about-us.html">About us</a><a href="projects.html">Projects</a><a href="contact.html" aria-current="page">Get in touch</a><a class="nav-cta" href="donate.html">Donate</a></nav>
+      <a class="menu-toggle" href="projects.html" aria-label="Explore our projects">Explore</a>
+    </div>
+  </header>
+  <main id="home">
+    <section class="ct-hero" aria-labelledby="ct-title">
+      <div class="wrap ct-grid">
+        <div class="ct-form-wrap">
+          <h1 id="ct-title">We would love to hear from you.</h1>
+          <p class="ct-lead">Ask a question, share a thought, or tell us how you would like to help.</p>
+          <form class="ct-form" id="contact-form" novalidate>
+            <div class="field"><label for="cf-name">Your name</label><input id="cf-name" name="name" type="text" autocomplete="name" required aria-describedby="cf-name-err"><p class="field-error" id="cf-name-err" hidden>Please enter your name.</p></div>
+            <div class="field"><label for="cf-email">Email address</label><input id="cf-email" name="email" type="email" autocomplete="email" required aria-describedby="cf-email-err"><p class="field-error" id="cf-email-err" hidden>Please enter a valid email address.</p></div>
+            <div class="field"><label for="cf-msg">Your message</label><textarea id="cf-msg" name="message" rows="6" required aria-describedby="cf-msg-err"></textarea><p class="field-error" id="cf-msg-err" hidden>Please write a short message.</p></div>
+            <button class="button" type="submit">Send message</button>
+            <p class="form-note" id="cf-note" role="status" hidden>Your email app should open with the message ready to send. If it does not, write to <a href="mailto:zakaliyasharedblessings@gmail.com">zakaliyasharedblessings@gmail.com</a>.</p>
+          </form>
+        </div>
+        <aside class="ct-details" aria-label="Contact details">
+          <h2>Reach the ministry</h2>
+          <dl>
+            <div><dt>Email</dt><dd><a href="mailto:zakaliyasharedblessings@gmail.com">zakaliyasharedblessings@gmail.com</a></dd></div>
+            <div><dt>Phone</dt><dd><a href="tel:+16513996774">+1 651-399-6774</a></dd></div>
+            <div><dt>Address</dt><dd>3749 Goodwin Court N<br>Oakdale 55128, MN, USA</dd></div>
+            <div><dt>Where we serve</dt><dd>Kasozi, Uganda</dd></div>
+          </dl>
+          <div class="ct-social"><a href="https://www.facebook.com/profile.php?id=61555617577893" target="_blank" rel="noopener noreferrer">Facebook</a><a href="https://www.youtube.com/channel/UCfnoxkNg_kUQFy7qd6JV6fA" target="_blank" rel="noopener noreferrer">YouTube</a></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">
+      <div class="footer-main">
+        <div class="footer-brand"><a class="brand" href="index.html"><img class="brand-logo" src="assets/logo.png" alt="" width="96" height="58"><span><span class="brand-name">Zakaliya Shared Blessings Ministry</span><span class="brand-place">Sharing blessings</span></span></a><p>Sharing blessings with those in need. Founded in 2024.</p></div>
+        <nav class="footer-nav" aria-label="Footer navigation"><a href="index.html">Home</a><a href="about-us.html">About us</a><a href="projects.html">Projects</a><a href="contact.html">Get in touch</a><a href="donate.html">Donate</a></nav>
+      </div>
+      <div class="footer-bottom"><span>© 2026 Zakaliya Shared Blessings Ministry</span><span>Sharing blessings with care</span></div>
+    </div>
+  </footer>
+<script>
+(function(){
+  var f=document.getElementById('contact-form'); if(!f) return;
+  var TO='zakaliyasharedblessings@gmail.com';
+  function show(id,bad){var e=document.getElementById(id); if(e) e.hidden=!bad;}
+  f.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var n=f.elements.name.value.trim(), m=f.elements.email.value.trim(), t=f.elements.message.value.trim();
+    var okN=n.length>0, okE=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m), okM=t.length>0;
+    show('cf-name-err',!okN); show('cf-email-err',!okE); show('cf-msg-err',!okM);
+    f.elements.name.setAttribute('aria-invalid',!okN); f.elements.email.setAttribute('aria-invalid',!okE); f.elements.message.setAttribute('aria-invalid',!okM);
+    if(!(okN&&okE&&okM)) return;
+    var body=t+'\n\nFrom: '+n+' ('+m+')';
+    window.location.href='mailto:'+TO+'?subject='+encodeURIComponent('Message from '+n+' via the website')+'&body='+encodeURIComponent(body);
+    document.getElementById('cf-note').hidden=false;
+  });
+})();
+</script>
+</body>
+</html>
