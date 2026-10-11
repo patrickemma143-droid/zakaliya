@@ -204,3 +204,9 @@
 .founders-copy p { max-width: 480px; margin: 0; color: #465b4f; font-size: 15px; line-height: 1.8; }
 @media (max-width: 900px) { .founders-grid { grid-template-columns: .9fr 1.1fr; gap: 38px; } }
 @media (max-width: 640px) { .founders { padding-block: 62px 68px; } .founders-grid { grid-template-columns: 1fr; gap: 30px; } .founders-photo { width: min(100%, 390px); } .founders-copy h2 { font-size: 42px; } }
+
+/* Logo */
+.brand-logo { display: block; width: auto; height: 44px; }
+.footer-brand .brand-logo { height: 54px; padding: 6px 9px; border-radius: 10px; background: var(--paper); }
+@media (max-width: 640px) { .brand-logo { height: 38px; } .footer-brand .brand-logo { height: 48px; } }
+.footer-brand p { margin-left: 0; }
