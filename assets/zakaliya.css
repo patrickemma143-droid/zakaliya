@@ -342,3 +342,11 @@
   .pj-timeline li::before { top: 24px; left: -36px; width: 18px; height: 18px; transform: none; box-shadow: 0 0 0 5px var(--sage); }
 }
 .hp-soon .proj-tag { align-self: flex-start; }
+
+/* ===== Founders (v15) ===== */
+.founders-photo { width: min(100%, 440px); }
+.founders-photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 40%; border-radius: 18px; box-shadow: 0 28px 52px -26px rgba(24,50,42,.6); }
+.founders-photo figcaption { margin-top: 14px; font-size: 13px; }
+.founders-copy p { max-width: 500px; margin-bottom: 18px; font-size: 16px; line-height: 1.85; }
+.founders-link { margin-top: 10px; color: var(--forest); font-size: 13px; }
+.founders-link span { color: var(--forest); }
