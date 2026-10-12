@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/zakaliya.css?v=17">
+    <link rel="stylesheet" href="assets/zakaliya.css?v=18">
 </head>
 <body>
   <div class="topline" aria-hidden="true"></div>
@@ -96,6 +96,23 @@
         <a class="button" href="projects.html">See all projects</a>
       </div>
     </section>
+    <section class="daily-verse" id="daily-verse" aria-labelledby="daily-verse-title">
+      <div class="wrap dv-grid">
+        <div class="dv-side">
+          <p class="dv-kicker" id="daily-verse-title">Verse of the day</p>
+          <p class="dv-date" data-verse-date>Today</p>
+          <div class="dv-actions">
+            <button class="dv-btn dv-btn-main" type="button" data-verse-next>Next verse <span aria-hidden="true">&rarr;</span></button>
+            <button class="dv-btn" type="button" data-verse-copy><span>Copy verse</span></button>
+          </div>
+          <p class="dv-count" data-verse-count>Verse 1 of 31</p>
+        </div>
+        <div class="dv-body" data-verse-body aria-live="polite">
+          <span class="dv-mark" aria-hidden="true">&ldquo;</span>
+          <blockquote class="dv-quote"><p data-verse-text>And let us not be weary in well doing: for in due season we shall reap, if we faint not.</p><cite data-verse-ref>Galatians 6:9 &middot; KJV</cite></blockquote>
+        </div>
+      </div>
+    </section>
     <section class="invitation" id="contact" aria-labelledby="invitation-title">
       <div class="wrap invitation-inner">
         <div><p class="section-kicker">Be part of the journey</p><h2 id="invitation-title">Your generosity can travel a long way.</h2><p>Every act of support helps us continue sharing blessings with the community. Join us in this work or learn more about our projects.</p></div>
@@ -112,5 +129,6 @@
       <div class="footer-bottom"><span>© 2026 Zakaliya Shared Blessings Ministry</span><span>Sharing blessings with care</span></div>
     </div>
   </footer>
+  <script src="assets/verse.js?v=1" defer></script>
 </body>
 </html>
