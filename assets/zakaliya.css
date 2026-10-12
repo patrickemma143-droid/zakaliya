@@ -401,3 +401,9 @@
 .ct-social { display: flex; gap: 22px; padding-top: 22px; border-top: 1px solid rgba(250,249,244,.2); }
 .ct-social a { font-size: 14px; font-weight: 700; }
 @media (max-width: 767px) { .don-hero-inner, .don-use-grid, .ct-grid { grid-template-columns: 1fr; } .don-hero-media { justify-self: stretch; max-width: none; } .don-other-inner { flex-direction: column; align-items: flex-start; } }
+
+/* ===== Founders photo polish (v17) ===== */
+.founders-photo { position: relative; width: min(100%, 520px); isolation: isolate; }
+.founders-photo::before { position: absolute; z-index: -1; top: 24px; right: -20px; bottom: 44px; left: 24px; border-radius: 18px; background: var(--ochre); content: ""; }
+.founders-photo img { aspect-ratio: 1 / 1; object-position: 50% 30%; }
+@media (max-width: 767px) { .founders-photo { width: calc(100% - 14px); } .founders-photo::before { top: 16px; right: -14px; left: 16px; bottom: 40px; } }
