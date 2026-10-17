@@ -290,9 +290,9 @@
 .home-proj-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 40px; }
 .hp-card { display: flex; min-width: 0; flex-direction: column; overflow: hidden; border-radius: 18px; background: var(--white); box-shadow: 0 22px 44px -30px rgba(24,50,42,.45); }
 .hp-card img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; flex: 0 0 auto; object-fit: cover; }
-.hp-copy { flex: 1; padding: 24px 26px 28px; }
-.hp-copy h3 { margin: 12px 0 6px; color: var(--forest-deep); font: 700 21px/1.25 var(--display); letter-spacing: -.02em; }
-.hp-copy p { margin: 0; color: #4d6357; font-size: 14px; line-height: 1.7; }
+.hp-copy { flex: 1; padding: 24px 26px 28px; text-align: center; }
+.hp-copy h3 { margin: 12px 0 8px; color: var(--forest); font: 700 clamp(22px, 2vw, 28px)/1.2 "Playfair Display", Georgia, serif; letter-spacing: -.015em; text-wrap: balance; }
+.hp-copy p { max-width: 38ch; margin: 0 auto; color: #4d6357; font-size: 15px; line-height: 1.75; }
 @media (max-width: 767px) { .home-proj-grid { grid-template-columns: 1fr; gap: 18px; } .hp-card img { aspect-ratio: 4 / 3; } .hp-copy { padding: 22px 22px 24px; } }
 
 .pj-program { padding-block: clamp(64px, 8vw, 104px); }
