@@ -287,18 +287,13 @@
 .home-projects { padding-block: clamp(64px, 8vw, 110px); }
 .home-projects h2 { max-width: 640px; margin: 0 0 14px; color: var(--forest-deep); font: 700 clamp(32px, 3.8vw, 48px)/1.12 var(--display); letter-spacing: -.03em; text-wrap: balance; }
 .home-projects-lead { max-width: 520px; margin: 0 0 36px; color: #465b4f; font-size: 16px; line-height: 1.8; }
-.home-proj-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); grid-template-rows: auto auto; gap: 22px; margin-bottom: 40px; }
-.hp-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 18px; background: var(--white); box-shadow: 0 22px 44px -30px rgba(24,50,42,.45); }
-.hp-card img { display: block; width: 100%; height: auto; flex: 1 1 0; min-height: 190px; object-fit: cover; }
-.hp-main { grid-row: 1 / span 2; }
-.hp-main img { min-height: 340px; }
-.hp-copy { padding: 22px 24px 26px; }
+.home-proj-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 40px; }
+.hp-card { display: flex; min-width: 0; flex-direction: column; overflow: hidden; border-radius: 18px; background: var(--white); box-shadow: 0 22px 44px -30px rgba(24,50,42,.45); }
+.hp-card img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; flex: 0 0 auto; object-fit: cover; }
+.hp-copy { flex: 1; padding: 24px 26px 28px; }
 .hp-copy h3 { margin: 12px 0 6px; color: var(--forest-deep); font: 700 21px/1.25 var(--display); letter-spacing: -.02em; }
 .hp-copy p { margin: 0; color: #4d6357; font-size: 14px; line-height: 1.7; }
-.hp-soon { display: flex; flex-direction: column; justify-content: center; padding: 28px 28px 30px; border-radius: 18px; border-top: 5px solid var(--ochre); background: var(--forest-deep); color: var(--paper); }
-.hp-soon h3 { margin: 14px 0 8px; font: 700 21px/1.3 var(--display); letter-spacing: -.02em; }
-.hp-soon p { margin: 0; color: #d6e1d9; font-size: 14px; line-height: 1.7; }
-@media (max-width: 767px) { .home-proj-grid { grid-template-columns: 1fr; } .hp-main { grid-row: auto; } .hp-main img { min-height: 220px; } }
+@media (max-width: 767px) { .home-proj-grid { grid-template-columns: 1fr; gap: 18px; } .hp-card img { aspect-ratio: 4 / 3; } .hp-copy { padding: 22px 22px 24px; } }
 
 .pj-program { padding-block: clamp(56px, 7vw, 100px); }
 .pj-program-grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); align-items: center; gap: clamp(32px, 6vw, 88px); }
