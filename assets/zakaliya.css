@@ -456,3 +456,49 @@
   .dv-mark { font-size: 120px; }
 }
 @media (prefers-reduced-motion: reduce) { .dv-body, .dv-btn { transition: none; } }
+
+/* Mobile and tablet navigation and layout refinements */
+.nav { position: relative; }
+.menu-toggle { display: none; }
+.menu-toggle:focus-visible { outline: 3px solid var(--ochre); outline-offset: 3px; }
+.menu-icon { display: grid; width: 16px; gap: 4px; }
+.menu-icon span { display: block; height: 2px; border-radius: 2px; background: currentColor; }
+@media (max-width: 820px) {
+  .nav { min-height: 76px; gap: 16px; }
+  .nav-links { position: absolute; z-index: 5; top: calc(100% + 8px); right: 0; left: 0; display: none; flex-direction: column; align-items: stretch; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); box-shadow: 0 18px 38px -24px rgba(24,50,42,.55); }
+  .nav.is-open .nav-links { display: flex; }
+  .nav-links a:not(.nav-cta) { display: flex; min-height: 44px; align-items: center; padding: 8px 12px; border-radius: 8px; }
+  .nav-links a:not(.nav-cta):hover, .nav-links a[aria-current="page"]:not(.nav-cta) { background: var(--sage); text-decoration: none; }
+  .nav-links .nav-cta { min-height: 44px; margin-top: 4px; }
+  .menu-toggle { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid #c7d8ca; border-radius: 999px; background: transparent; color: var(--forest-deep); font: 700 11px/1 var(--sans); letter-spacing: .04em; cursor: pointer; }
+  .menu-toggle:hover, .menu-toggle[aria-expanded="true"] { background: var(--sage); }
+  .page-hero, .about-story, .beliefs, .project-page-work, .pj-program, .pj-build, .pj-future, .don-use, .founders { scroll-margin-top: 20px; }
+}
+@media (max-width: 767px) {
+  .wrap { width: calc(100% - 36px); }
+  .intro-copy p, .story-video-copy p:not(.section-kicker), .work-head p, .project-copy p,
+  .page-hero-copy > p:not(.section-kicker), .belief-list p, .upcoming-list p,
+  .pj-program-copy > p, .pj-project-copy > p, .pj-build-lead, .pj-future-list p,
+  .about-brief-copy > p, .founders-copy p, .don-hero-copy > p, .don-list dd,
+  .ct-lead, .form-note { font-size: 16px; }
+  .story-video h3 { font-size: clamp(28px, 6vw, 32px); }
+  .project-list-page .project p, .proj-feature p { font-size: 16px; }
+  .pj-project-copy h3, .pj-future-list h3 { font-size: clamp(24px, 6vw, 32px); }
+  .project-page-work, .pj-program, .pj-build, .pj-future { padding-block: 58px 64px; }
+  .ct-form { padding: 22px 18px; }
+  .footer-nav { gap: 16px 22px; }
+  .footer-nav a { min-height: 44px; display: inline-flex; align-items: center; font-size: 11px; }
+  .footer-bottom { font-size: 11px; letter-spacing: .03em; }
+}
+@media (max-width: 380px) {
+  .wrap { width: calc(100% - 32px); }
+  .nav { gap: 8px; }
+  .brand { gap: 8px; }
+  .brand-logo { height: 34px; }
+  .brand-name { max-width: 128px; font-size: 9px; letter-spacing: .075em; }
+  .brand-place { font-size: 8px; }
+  .menu-toggle { gap: 6px; padding-inline: 10px; }
+  .hero h1 { font-size: 38px; }
+  .intro h2, .work h2, .invitation h2, .beliefs h2, .upcoming-intro h2, .founders-copy h2 { font-size: 36px; }
+  .page-hero h1 { font-size: 40px; }
+}

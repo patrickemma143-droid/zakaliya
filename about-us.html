@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/zakaliya.css?v=18">
+  <link rel="stylesheet" href="assets/zakaliya.css?v=21">
 </head>
 <body>
   <div class="topline" aria-hidden="true"></div>
@@ -20,10 +20,10 @@
         <img class="brand-logo" src="assets/logo.png" alt="" width="96" height="58">
         <span><span class="brand-name">Zakaliya Shared Blessings Ministry</span><span class="brand-place">Sharing blessings</span></span>
       </a>
-      <nav class="nav-links" aria-label="Main navigation">
+      <nav class="nav-links" id="primary-navigation" aria-label="Main navigation">
         <a href="index.html">Home</a><a href="about-us.html" aria-current="page">About us</a><a href="projects.html">Projects</a><a href="contact.html">Get in touch</a><a class="nav-cta" href="donate.html">Donate</a>
       </nav>
-      <a class="menu-toggle" href="projects.html" aria-label="Explore our projects">Explore</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation"><span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span><span>Menu</span></button>
     </div>
   </header>
   <main id="home">
@@ -49,5 +49,6 @@
       <div class="footer-bottom"><span>© 2026 Zakaliya Shared Blessings Ministry</span><span>Made with care</span></div>
     </div>
   </footer>
+  <script src="assets/navigation.js?v=1" defer></script>
 </body>
 </html>
