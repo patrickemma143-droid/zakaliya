@@ -168,14 +168,14 @@
 .projects-hero h1 em { color: var(--ochre-light); }
 .projects-hero .page-hero-copy > p:not(.section-kicker) { color: #d6e1d9; }
 .projects-hero .section-kicker { color: var(--ochre-light); }
-.projects-hero-image img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 18px; }
+.projects-hero-image img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: center 58%; border: 1px solid rgba(241,217,148,.26); border-radius: 18px; box-shadow: 0 24px 54px -34px rgba(0,0,0,.72); }
 .project-page-work { padding-block: 84px 100px; }
 .project-list-page { row-gap: 26px; }
 .project-list-page .project-copy { min-height: 190px; padding: 25px 24px 28px; }
 .project-list-page .project h3 { font-size: 25px; }
 .project-list-page .project p { font-size: 14px; line-height: 1.8; }
 @media (max-width: 900px) { .page-hero-inner { grid-template-columns: 1fr .85fr; gap: 36px; } .beliefs-grid { grid-template-columns: 1fr 1.25fr; gap: 38px; } .project-list-page .project-copy { min-height: 210px; } }
-@media (max-width: 640px) { .page-hero { padding-block: 56px 62px; } .page-hero-inner { grid-template-columns: 1fr; gap: 35px; } .page-hero h1 { margin-block: 14px 18px; font-size: 48px; } .page-hero-copy > p:not(.section-kicker) { font-size: 14px; } .about-photo img { max-height: 400px; } .about-story { padding-block: 65px 70px; } .beliefs { padding-block: 64px 70px; } .beliefs-grid { grid-template-columns: 1fr; gap: 27px; } .beliefs h2 { font-size: 42px; } .belief-list article { grid-template-columns: .65fr 1fr; gap: 18px; } .belief-list h3 { font-size: 21px; } .projects-hero-image img { aspect-ratio: 1.5 / 1; } .project-page-work { padding-block: 67px 76px; } .project-list-page .project-copy { min-height: 0; } }
+@media (max-width: 640px) { .page-hero { padding-block: 56px 62px; } .page-hero-inner { grid-template-columns: 1fr; gap: 35px; } .page-hero h1 { margin-block: 14px 18px; font-size: 48px; } .page-hero-copy > p:not(.section-kicker) { font-size: 14px; } .about-photo img { max-height: 400px; } .about-story { padding-block: 65px 70px; } .beliefs { padding-block: 64px 70px; } .beliefs-grid { grid-template-columns: 1fr; gap: 27px; } .beliefs h2 { font-size: 42px; } .belief-list article { grid-template-columns: .65fr 1fr; gap: 18px; } .belief-list h3 { font-size: 21px; } .projects-hero-image img { aspect-ratio: 16 / 9; } .project-page-work { padding-block: 67px 76px; } .project-list-page .project-copy { min-height: 0; } }
 
 /* Editorial type hierarchy for ministry stories and project detail */
 .project-list-page .project h3 { font-size: 19px; letter-spacing: .025em; text-transform: uppercase; }
