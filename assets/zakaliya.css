@@ -163,19 +163,23 @@
 .belief-list article:last-child { border-bottom: 1px solid var(--line); }
 .belief-list h3 { margin: 0; font: 600 24px/1.25 var(--display); }
 .belief-list p { margin: 0; color: #536a5d; font-size: 14px; line-height: 1.75; }
-.projects-hero { background: var(--forest-deep); color: var(--paper); }
+.projects-hero { position: relative; isolation: isolate; overflow: hidden; padding-block: 0; background: var(--forest-deep); color: var(--paper); }
+.projects-hero::before { position: absolute; z-index: 1; inset: 0; background: linear-gradient(90deg, rgba(24,50,42,.94) 0%, rgba(24,50,42,.8) 34%, rgba(24,50,42,.36) 68%, rgba(24,50,42,.18) 100%), linear-gradient(0deg, rgba(14,28,23,.34), transparent 46%); content: ""; pointer-events: none; }
+.projects-hero .page-hero-inner { position: relative; z-index: 2; display: flex; min-height: clamp(500px, 58vw, 690px); align-items: center; padding-block: clamp(76px, 9vw, 126px); }
+.projects-hero .page-hero-copy { width: min(650px, 68%); }
 .projects-hero h1 { color: var(--paper); }
 .projects-hero h1 em { color: var(--ochre-light); }
 .projects-hero .page-hero-copy > p:not(.section-kicker) { color: #d6e1d9; }
 .projects-hero .section-kicker { color: var(--ochre-light); }
-.projects-hero-image img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: center 58%; border: 1px solid rgba(241,217,148,.26); border-radius: 18px; box-shadow: 0 24px 54px -34px rgba(0,0,0,.72); }
+.projects-hero-image { position: absolute; z-index: 0; inset: 0; }
+.projects-hero-image img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 58%; }
 .project-page-work { padding-block: 84px 100px; }
 .project-list-page { row-gap: 26px; }
 .project-list-page .project-copy { min-height: 190px; padding: 25px 24px 28px; }
 .project-list-page .project h3 { font-size: 25px; }
 .project-list-page .project p { font-size: 14px; line-height: 1.8; }
 @media (max-width: 900px) { .page-hero-inner { grid-template-columns: 1fr .85fr; gap: 36px; } .beliefs-grid { grid-template-columns: 1fr 1.25fr; gap: 38px; } .project-list-page .project-copy { min-height: 210px; } }
-@media (max-width: 640px) { .page-hero { padding-block: 56px 62px; } .page-hero-inner { grid-template-columns: 1fr; gap: 35px; } .page-hero h1 { margin-block: 14px 18px; font-size: 48px; } .page-hero-copy > p:not(.section-kicker) { font-size: 14px; } .about-photo img { max-height: 400px; } .about-story { padding-block: 65px 70px; } .beliefs { padding-block: 64px 70px; } .beliefs-grid { grid-template-columns: 1fr; gap: 27px; } .beliefs h2 { font-size: 42px; } .belief-list article { grid-template-columns: .65fr 1fr; gap: 18px; } .belief-list h3 { font-size: 21px; } .projects-hero-image img { aspect-ratio: 16 / 9; } .project-page-work { padding-block: 67px 76px; } .project-list-page .project-copy { min-height: 0; } }
+@media (max-width: 640px) { .page-hero { padding-block: 56px 62px; } .page-hero-inner { grid-template-columns: 1fr; gap: 35px; } .page-hero h1 { margin-block: 14px 18px; font-size: 48px; } .page-hero-copy > p:not(.section-kicker) { font-size: 14px; } .about-photo img { max-height: 400px; } .about-story { padding-block: 65px 70px; } .beliefs { padding-block: 64px 70px; } .beliefs-grid { grid-template-columns: 1fr; gap: 27px; } .beliefs h2 { font-size: 42px; } .belief-list article { grid-template-columns: .65fr 1fr; gap: 18px; } .belief-list h3 { font-size: 21px; } .projects-hero { padding-block: 0; } .projects-hero .page-hero-inner { min-height: clamp(540px, 82svh, 720px); padding-block: 72px 82px; } .projects-hero .page-hero-copy { width: 100%; max-width: 540px; } .projects-hero::before { background: linear-gradient(90deg, rgba(24,50,42,.88), rgba(24,50,42,.43)), linear-gradient(0deg, rgba(14,28,23,.6), transparent 70%); } .projects-hero-image img { object-position: 55% center; } .project-page-work { padding-block: 67px 76px; } .project-list-page .project-copy { min-height: 0; } }
 
 /* Editorial type hierarchy for ministry stories and project detail */
 .project-list-page .project h3 { font-size: 19px; letter-spacing: .025em; text-transform: uppercase; }
