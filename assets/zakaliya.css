@@ -434,7 +434,7 @@
 /* ===== Founders photo polish (v17) ===== */
 .founders-photo { position: relative; width: min(100%, 520px); isolation: isolate; }
 .founders-photo::before { position: absolute; z-index: -1; top: 24px; right: -20px; bottom: 44px; left: 24px; border-radius: 18px; background: var(--ochre); content: ""; }
-.founders-photo img { aspect-ratio: 1 / 1; object-position: 50% 30%; }
+.founders-photo img { aspect-ratio: 1 / 1; object-position: center; }
 @media (max-width: 767px) { .founders-photo { width: calc(100% - 14px); } .founders-photo::before { top: 16px; right: -14px; left: 16px; bottom: 40px; } }
 
 /* v18 daily verse */
