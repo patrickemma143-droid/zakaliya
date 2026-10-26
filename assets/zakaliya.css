@@ -419,6 +419,17 @@
 .founders-copy p { max-width: 500px; margin-bottom: 18px; font-size: 16px; line-height: 1.85; }
 .founders-link { margin-top: 10px; color: var(--forest); font-size: 13px; }
 .founders-link span { color: var(--forest); }
+.recognition { padding-block: clamp(58px, 7vw, 96px); background: var(--sage); }
+.recognition-heading { display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); align-items: start; gap: clamp(32px, 6vw, 84px); }
+.recognition-heading h2 { max-width: 480px; margin: 0; color: var(--forest-deep); font: 700 clamp(32px, 4vw, 48px)/1.1 var(--display); letter-spacing: -.035em; text-wrap: balance; }
+.recognition-copy { max-width: 720px; }
+.recognition-copy p { margin: 0 0 14px; color: #3f554a; font-size: 15px; line-height: 1.75; }
+.recognition-copy .recognition-blessing { margin-bottom: 0; color: var(--forest); font-weight: 700; }
+.recognition-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 30px); margin-top: clamp(30px, 4vw, 48px); }
+.recognition-gallery figure { min-width: 0; margin: 0; }
+.recognition-gallery img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: center 43%; border-radius: 14px; box-shadow: 0 20px 40px -28px rgba(24,50,42,.52); }
+.recognition-gallery figcaption { margin-top: 11px; color: #52675c; font-size: 12px; line-height: 1.55; }
+@media (max-width: 767px) { .recognition-heading { grid-template-columns: 1fr; gap: 18px; } .recognition-gallery { grid-template-columns: 1fr; gap: 22px; } }
 
 /* ===== Donate + Contact pages (v16) ===== */
 .don-hero { background: var(--forest-deep) radial-gradient(60% 80% at 85% 40%, rgba(29,99,72,.55) 0%, rgba(29,99,72,0) 70%); color: var(--paper); }
