@@ -14,6 +14,9 @@ https://zakaliyasbm-mn.com/wp-content/uploads/2024/02/WhatsApp-Image-2024-01-25-
 church-building-enhanced.jpg
 Enhanced local version of church-building.jpg with mild contrast, color, and sharpening adjustments. The original is preserved.
 
+church-building-home-crop.jpg
+Tight 16:9 crop of church-building-enhanced.jpg for the homepage completed-project card, reducing sky and foreground while retaining the church roof and entrance.
+
 projects-hero-children.jpg
 Wide 2:1 crop of kids-support.jpg, prepared for the Projects page hero with mild contrast, color, and sharpening adjustments. The source photo is preserved.
 
