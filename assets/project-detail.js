@@ -99,7 +99,7 @@
 
   /* ---------- Scroll reveal ---------- */
   var revealEls = document.querySelectorAll("[data-reveal]");
-  if (revealEls.length && "IntersectionObserver" in window) {
+  if (revealEls.length && "IntersectionObserver" in window && !window.gsap) {
     document.documentElement.classList.add("reveal-ready");
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
