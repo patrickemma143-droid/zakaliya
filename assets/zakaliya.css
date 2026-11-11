@@ -627,3 +627,7 @@
   .intro h2, .work h2, .invitation h2, .beliefs h2, .upcoming-intro h2, .founders-copy h2 { font-size: 36px; }
   .page-hero h1 { font-size: 40px; }
 }
+
+/* Portrait photos in landscape frames: keep the subject near the top in view */
+.home-project-card-media > img.img-focus-top,
+.pj-project-row .pj-project-media > img.img-focus-top { object-position: 50% 8%; }
