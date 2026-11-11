@@ -1,0 +1,13 @@
+# Browser caching rules
+# Pages, styles and scripts: browsers must check for a newer version on every visit,
+# so changes show up right after a deploy (unchanged files still load from cache via a quick check).
+# Images and fonts: kept for 1 day to keep the site fast.
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html?|css|js)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(jpe?g|png|webp|gif|svg|ico|woff2?)$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+</IfModule>
