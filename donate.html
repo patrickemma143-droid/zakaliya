@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/zakaliya.css?v=36">
+  <link rel="stylesheet" href="assets/donate.css?v=1">
   <script>document.documentElement.classList.add("js-anim");setTimeout(function(){if(!window.gsap)document.documentElement.classList.remove("js-anim")},3000);</script>
 </head>
 <body>
@@ -28,7 +29,14 @@
         <div class="don-hero-copy">
           <h1 id="don-title">Your gift reaches <em>Kasozi.</em></h1>
           <p>Every donation helps children learn, builds classrooms, and opens new skills for young people.</p>
-          <div class="hero-actions"><a class="button don-button" href="https://zakaliyasbm-mn.com/donations/you-can-make-your-donation-here/" rel="noopener">Donate securely</a><a class="text-link" href="projects.html">See where it goes <span aria-hidden="true">&rarr;</span></a></div>
+          <div class="give" data-give hidden>
+            <div class="give-freq" data-give-freq role="group" aria-label="How often" hidden><button type="button" data-freq="once" aria-pressed="true">Give once</button><button type="button" data-freq="monthly" aria-pressed="false">Monthly</button></div>
+            <div class="give-amounts" data-give-amounts role="group" aria-label="Choose an amount"></div>
+            <a class="button don-button give-cta" data-give-cta href="#">Donate securely</a>
+            <p class="give-note" data-give-note></p>
+            <p class="give-secure"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Secure checkout by Stripe. Your card details go straight to Stripe; we never see or store them.</p>
+          </div>
+          <div class="hero-actions"><a class="button don-button" data-legacy-donate href="https://zakaliyasbm-mn.com/donations/you-can-make-your-donation-here/" rel="noopener">Donate securely</a><a class="text-link" href="projects.html">See where it goes <span aria-hidden="true">&rarr;</span></a></div>
         </div>
         <figure class="don-hero-media"><img src="assets/kids-support.jpg" alt="Children gathered outside a ministry building in Kasozi" width="1080" height="810" decoding="async" fetchpriority="high"></figure>
       </div>
@@ -68,6 +76,8 @@
     </div>
   </footer>
   <script src="assets/navigation.js?v=1" defer></script>
+  <script src="assets/donate-links.js?v=1" defer></script>
+  <script src="assets/donate.js?v=1" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js" defer></script>

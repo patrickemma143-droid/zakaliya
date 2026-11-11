@@ -1,0 +1,32 @@
+/* Donation picker on donate.html (dark hero background) */
+.give { max-width: 470px; margin-bottom: 26px; padding: 22px; border: 1px solid rgba(241,217,148,.22); border-radius: 18px; background: rgba(250,249,244,.05); }
+.give-freq { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 16px; padding: 4px; border-radius: 999px; background: rgba(8,20,15,.45); }
+.give-freq button { min-height: 42px; border: 0; border-radius: 999px; background: transparent; color: #d6e1d9; font: 700 13px/1 var(--sans); cursor: pointer; transition: background-color .18s ease, color .18s ease; }
+.give-freq button[aria-pressed="true"] { background: var(--paper); color: var(--forest-deep); }
+.give-amounts { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 8px; margin-bottom: 16px; }
+.give-amount { min-height: 50px; padding: 0 12px; border: 1px solid rgba(250,249,244,.28); border-radius: 12px; background: transparent; color: var(--paper); font: 700 17px/1 var(--sans); font-variant-numeric: tabular-nums; cursor: pointer; transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .16s ease-out; }
+.give-amount-other { grid-column: 1 / -1; min-height: 44px; font-size: 13px; }
+.give-amount[aria-pressed="true"] { border-color: var(--ochre); background: var(--ochre); color: var(--forest-deep); }
+.give-amount:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) {
+  .give-amount:hover:not([aria-pressed="true"]) { border-color: var(--ochre-light); }
+  .give-freq button:hover:not([aria-pressed="true"]) { color: var(--paper); }
+}
+.give-freq button:focus-visible, .give-amount:focus-visible, .give-cta:focus-visible { outline: 3px solid var(--ochre-light); outline-offset: 3px; }
+.give-cta { width: 100%; }
+.give-note { min-height: 1.4em; margin: 12px 0 0; color: #c8d6cc; font-size: 13px; line-height: 1.5; }
+.give-secure { display: flex; align-items: flex-start; gap: 8px; margin: 10px 0 0; padding-top: 12px; border-top: 1px solid rgba(250,249,244,.12); color: #a9bdb0; font-size: 12px; line-height: 1.55; }
+.give-secure svg { flex: 0 0 auto; margin-top: 2px; color: var(--ochre-light); }
+@media (prefers-reduced-motion: reduce) { .give-amount:active { transform: none; } }
+@media (max-width: 640px) { .give { padding: 16px; } .give-amounts { grid-template-columns: 1fr 1fr; } }
+
+/* Thank-you page */
+.ty { padding-block: clamp(70px, 10vw, 130px); background: var(--forest-deep) radial-gradient(60% 80% at 85% 40%, rgba(29,99,72,.55) 0%, rgba(29,99,72,0) 70%); color: var(--paper); }
+.ty-inner { max-width: 640px; }
+.ty h1 { margin: 0 0 20px; color: var(--paper); font: 700 clamp(38px, 5vw, 62px)/1.08 var(--display); letter-spacing: -.035em; text-wrap: balance; }
+.ty h1 em { color: var(--ochre-light); font-style: normal; }
+.ty p { max-width: 520px; margin: 0 0 18px; color: #d6e1d9; font-size: 17px; line-height: 1.75; }
+.ty .hero-actions { margin-top: 30px; }
+.ty .button { border-color: var(--ochre); background: var(--ochre); color: var(--forest-deep) !important; }
+.ty .button:hover { background: var(--ochre-light); }
+.ty .text-link { color: var(--paper); }
