@@ -317,7 +317,6 @@
 .home-project-card { min-width: 0; align-self: stretch; border-color: rgba(250,249,244,.16); border-radius: 12px; }
 .home-project-card-media { position: relative; display: block; overflow: hidden; width: 100%; aspect-ratio: 16 / 10; margin: 0; background: #dbe5dd; }
 .home-project-card-media > img { display: block; width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }
-.home-tailoring-images { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
 .home-image-credit { position: absolute; right: 0; bottom: 0; left: 0; padding: 26px 11px 8px; background: linear-gradient(transparent, rgba(13,34,27,.78)); color: #fff; font-size: 10px; font-weight: 600; line-height: 1.4; text-align: right; }
 .home-image-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .home-project-card .hp-copy { padding: 17px 18px 16px; }
@@ -452,8 +451,6 @@
 .pj-project-row.pj-horizontal .pj-gallery-buttons button:hover { border-color: var(--forest); background: var(--forest); color: white; }
 .pj-project-row.pj-horizontal .pj-gallery-toggle { color: var(--forest) !important; }
 .pj-project-row.pj-horizontal .pj-gallery-toggle:hover { color: white !important; }
-.pj-tailoring-media { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
-.pj-tailoring-media img { min-width: 0; object-position: center; }
 .pj-image-credit { position: absolute; right: 0; bottom: 0; left: 0; margin: 0; padding: 22px 8px 7px; background: linear-gradient(transparent, rgba(13,34,27,.82)); color: #fff; font-size: 10px; font-weight: 600; line-height: 1.35; text-align: right; }
 .pj-image-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 @media (max-width: 767px) {
