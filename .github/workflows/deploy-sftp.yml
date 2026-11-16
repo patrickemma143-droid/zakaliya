@@ -101,7 +101,9 @@ jobs:
           if [ $rc -ne 0 ]; then diag "Could not connect or list the folder (lftp exit $rc)"; exit 1; fi
           echo "Files in the target folder:"; echo "$listing" | sed 's|.*/||' | sort | head -40
           if ! echo "$listing" | grep -qE '(^|/)wp-config\.php$'; then
-            echo "::error::wp-config.php not found in SFTP_DIR ($SFTP_DIR). Upload stopped. Check the SFTP_DIR secret."; exit 1
+            echo "::error::wp-config.php not found in SFTP_DIR ($SFTP_DIR). Upload stopped. Check the SFTP_DIR secret."
+            echo "::error::Names in that folder: $(echo "$listing" | sed 's|/*$||; s|.*/||' | sort | head -30 | tr '\n' ' ')"
+            exit 1
           fi
           echo "OK: target folder contains wp-config.php"
 
