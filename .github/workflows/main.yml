@@ -1,13 +1,18 @@
-name: Deploy to FTP
+name: Deploy to FTPS
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+# Never run two uploads at the same time
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    name: Upload site via FTP
+    name: Upload site via FTPS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,15 +21,18 @@ jobs:
       - name: Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          server: ${{ secrets.FTP_SERVER }}            # the host's FTP server name, e.g. ftp.zakaliyasbm-mn.com
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}   # e.g. /public_html/ (must end with /)
-          protocol: ftp                               # change to ftps if your host supports TLS
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}    # e.g. /public_html/ (must end with /)
+          protocol: ftps                               # encrypted FTP (explicit TLS)
           port: 21
+          security: strict                             # verify the server's certificate; see DEPLOY.md if it fails
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             README.md
+            DEPLOY.md
             .env
+            standalone-rebrand.html

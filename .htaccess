@@ -1,8 +1,44 @@
-# Browser caching rules
-# Pages, styles and scripts: browsers must check for a newer version on every visit,
+# Zakaliya Shared Blessings Ministry: zakaliyasbm-mn.com (static site)
+
+# Serve our index.html first, even if old WordPress files (index.php) are still on the server
+DirectoryIndex index.html index.php
+
+# Friendly "page not found" page
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Always use https://zakaliyasbm-mn.com (no www).
+  # The X-Forwarded-Proto check stops redirect loops when Cloudflare sits in front of the server.
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Old WordPress addresses -> matching new pages (keeps old links and search results working)
+  RewriteRule ^home/?$ / [L,R=301]
+  RewriteRule ^(about|about-2)/?$ /about-us.html [L,R=301]
+  RewriteRule ^(contact|contact-3|join-us)/?$ /contact.html [L,R=301]
+  RewriteRule ^(projects01|services)/?$ /projects.html [L,R=301]
+  RewriteRule ^donation-confirmation/?$ /thank-you.html [L,R=301]
+  RewriteRule ^(donations|donations/.*|donation-failed|donate)/?$ /donate.html [L,R=301]
+  RewriteRule ^(blog|blog-post-title|my-account|my-cart|checkout|shop|donor-dashboard|terms|privacy)/?$ / [L,R=301]
+  RewriteRule ^(about-us|projects|contact|donate|thank-you)/?$ /$1.html [L,R=301]
+</IfModule>
+
+# Keep the deploy tool's bookkeeping file private
+<Files ".ftp-deploy-sync-state.json">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</Files>
+
+# Browser caching
+# Pages, styles and scripts: browsers check for a newer version on every visit,
 # so changes show up right after a deploy (unchanged files still load from cache via a quick check).
 # Images and fonts: kept for 1 day to keep the site fast.
-
 <IfModule mod_headers.c>
   <FilesMatch "\.(html?|css|js)$">
     Header set Cache-Control "no-cache, must-revalidate"
@@ -10,4 +46,8 @@
   <FilesMatch "\.(jpe?g|png|webp|gif|svg|ico|woff2?)$">
     Header set Cache-Control "public, max-age=86400"
   </FilesMatch>
+  # Basic security headers
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
 </IfModule>
