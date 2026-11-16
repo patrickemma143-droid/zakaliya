@@ -145,13 +145,15 @@ jobs:
             set net:max-retries 2; set net:timeout 30; set sftp:auto-confirm no;
             set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
             open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
-            mirror --parallel=4 --exclude-glob '*.png' --exclude-glob '*.jpg' --exclude-glob '*.svg' --exclude-glob '*.woff*' \"${SFTP_DIR}wp-content/mu-plugins/\" /tmp/mu;
+            get \"${SFTP_DIR}wp-content/mu-plugins/gd-system-plugin/includes/cli/class-cache.php\" -o /tmp/mu/cli-cache.php;
+            get \"${SFTP_DIR}wp-content/mu-plugins/gd-system-plugin/includes/cache/class-v2-manager.php\" -o /tmp/mu/v2.php;
             bye" 2>/tmp/inspect.err || true
-          esc() { sed 's/%/%25/g' | tr '\r\n' ' ¶' | cut -c1-3800; }
-          echo "::notice::mu-plugins: $(cd /tmp/mu && find . -maxdepth 2 | sort | head -40 | esc)"
-          echo "::notice::cache code: $(grep -rnE 'class Cache|function (ban|has_ban|purge|do_ban|flush|flush_cache)[ (]|FLUSH_CACHE|wpaas_.*(flush|ban|purge)' /tmp/mu --include='*.php' | sed 's|/tmp/mu/||' | head -40 | esc)"
-          f=$(grep -rlE 'function ban[ (]' /tmp/mu --include='*.php' | head -1)
-          [ -n "$f" ] && echo "::notice::ban() in ${f#/tmp/mu/}: $(grep -nE -A12 'function (ban|do_ban)[ (]' "$f" | head -60 | esc)"
+          esc() { sed 's/%/%25/g' | tr '\r\n' ' ¶' | cut -c1-3900; }
+          nocomment() { grep -vE '^[[:space:]]*(\*|/\*\*|\*/)'; }
+          echo "::notice::cli flush: $(sed -n '25,130p' /tmp/mu/cli-cache.php | nocomment | esc)"
+          echo "::notice::cli flush 2: $(sed -n '130,200p' /tmp/mu/cli-cache.php | nocomment | esc)"
+          echo "::notice::v2 methods: $(grep -nE '(public|private|protected).*function' /tmp/mu/v2.php | esc)"
+          echo "::notice::v2 ban/flush_cdn: $(grep -nE -A14 'function (ban|do_ban|flush_cdn)[ (]' /tmp/mu/v2.php | head -75 | esc)"
           echo "::notice::lftp: $(tail -n 3 /tmp/inspect.err | esc)"
 
       - name: Upload changed files
