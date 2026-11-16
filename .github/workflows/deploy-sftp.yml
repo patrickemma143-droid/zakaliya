@@ -129,6 +129,31 @@ jobs:
           fi
           echo "OK: target folder contains wp-config.php"
 
+      # One-time diagnostic (runs only when the commit message contains [inspect-cache]):
+      # reads GoDaddy's must-use system plugin to find how it clears the page cache. Read-only.
+      - name: Inspect GoDaddy cache plugin
+        if: contains(github.event.head_commit.message, '[inspect-cache]')
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST || vars.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT || vars.SFTP_PORT }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME || vars.SFTP_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_DIR: ${{ secrets.SFTP_DIR || vars.SFTP_DIR }}
+        run: |
+          mkdir -p /tmp/mu
+          lftp -c "
+            set net:max-retries 2; set net:timeout 30; set sftp:auto-confirm no;
+            set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
+            open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
+            mirror --parallel=4 --exclude-glob '*.png' --exclude-glob '*.jpg' --exclude-glob '*.svg' --exclude-glob '*.woff*' \"${SFTP_DIR}wp-content/mu-plugins/\" /tmp/mu;
+            bye" 2>/tmp/inspect.err || true
+          esc() { sed 's/%/%25/g' | tr '\r\n' ' ¶' | cut -c1-3800; }
+          echo "::notice::mu-plugins: $(cd /tmp/mu && find . -maxdepth 2 | sort | head -40 | esc)"
+          echo "::notice::cache code: $(grep -rnE 'class Cache|function (ban|has_ban|purge|do_ban|flush|flush_cache)[ (]|FLUSH_CACHE|wpaas_.*(flush|ban|purge)' /tmp/mu --include='*.php' | sed 's|/tmp/mu/||' | head -40 | esc)"
+          f=$(grep -rlE 'function ban[ (]' /tmp/mu --include='*.php' | head -1)
+          [ -n "$f" ] && echo "::notice::ban() in ${f#/tmp/mu/}: $(grep -nE -A12 'function (ban|do_ban)[ (]' "$f" | head -60 | esc)"
+          echo "::notice::lftp: $(tail -n 3 /tmp/inspect.err | esc)"
+
       - name: Upload changed files
         if: ${{ (github.event_name == 'push' && vars.DEPLOY_LIVE == 'true') || (github.event_name == 'workflow_dispatch' && !inputs.check_only) }}
         env:
