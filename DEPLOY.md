@@ -39,16 +39,29 @@ If it fails with a **certificate** error, the server name doesn't match the host
 Use the exact hostname the host shows for FTPS. Only as a last resort, change `security: strict` to `security: loose`
 in `.github/workflows/main.yml` (still encrypted, but the certificate isn't checked).
 
-## 6. Domain and HTTPS
-- The domain is on **Cloudflare**. Point the `zakaliyasbm-mn.com` (and `www`) DNS records at the new host if they don't already.
-- In Cloudflare → **SSL/TLS**, use **Full (strict)** once the host has an SSL certificate (most hosts issue a free one).
-- The site redirects `http://` and `www.` to `https://zakaliyasbm-mn.com/` automatically.
+## 6. Domain (DNS at GoDaddy) and HTTPS
+DNS is managed at **GoDaddy** (nameservers `ns03/ns04.domaincontrol.com`). As of 16 Nov 2026:
+
+| Type | Name | Value |
+|---|---|---|
+| A | `@` | `160.153.0.42` (old WordPress hosting; this is the rollback value) |
+| CNAME | `www` | `@` (keep as is) |
+| MX / TXT | none | no domain email to protect |
+
+1. In the new hosting account, add `zakaliyasbm-mn.com` as the account's domain (cPanel: **Domains**), so the host knows to serve it.
+2. A day before: GoDaddy → **Domain → DNS** → edit the `@` A record and set **TTL** to the lowest option (e.g. 600 seconds / 1/2 hour).
+3. Deploy the site to the new host first (steps 3-5), and optionally preview it via your computer's `hosts` file.
+4. Switch: edit the `@` **A** record to the **new host's IP address** (cPanel shows it as "Shared IP Address"). Leave `www` alone.
+5. Once the domain points at the new host, run **SSL/TLS Status → Run AutoSSL** (or install the host's free certificate).
+6. Rollback if anything goes wrong: set the `@` A record back to `160.153.0.42`.
+
+The site redirects `http://` and `www.` to `https://zakaliyasbm-mn.com/` automatically.
 
 ## 7. After going live: check
 - https://zakaliyasbm-mn.com/ loads the new home page.
 - Old addresses redirect, e.g. `/about/` → About, `/contact/` → Contact, `/donations/...` → Donate.
 - A made-up address shows the "page has moved" page.
-- In Cloudflare → **Caching → Purge Everything** once, so no old WordPress pages are served from cache.
+- `https://` shows a valid padlock (certificate issued by the new host).
 - Submit `https://zakaliyasbm-mn.com/sitemap.xml` in Google Search Console.
 
 ## 8. Stripe
