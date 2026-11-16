@@ -36,12 +36,12 @@ jobs:
       # Reports only "set" or "EMPTY" for each secret, never the values.
       - name: Check all secrets are present
         env:
-          S_HOST: ${{ secrets.SFTP_HOST }}
-          S_PORT: ${{ secrets.SFTP_PORT }}
-          S_USER: ${{ secrets.SFTP_USERNAME }}
+          S_HOST: ${{ secrets.SFTP_HOST || vars.SFTP_HOST }}
+          S_PORT: ${{ secrets.SFTP_PORT || vars.SFTP_PORT }}
+          S_USER: ${{ secrets.SFTP_USERNAME || vars.SFTP_USERNAME }}
           S_PASS: ${{ secrets.SFTP_PASSWORD }}
-          S_DIR: ${{ secrets.SFTP_DIR }}
-          S_KH: ${{ secrets.SFTP_KNOWN_HOSTS }}
+          S_DIR: ${{ secrets.SFTP_DIR || vars.SFTP_DIR }}
+          S_KH: ${{ secrets.SFTP_KNOWN_HOSTS || vars.SFTP_KNOWN_HOSTS }}
         run: |
           missing=""
           for n in HOST PORT USERNAME PASSWORD DIR KNOWN_HOSTS; do
@@ -49,13 +49,13 @@ jobs:
             if [ -z "$(printf '%s' "$v" | tr -d ' \t\r\n')" ]; then missing="$missing SFTP_$n"; fi
           done
           if [ -n "$missing" ]; then
-            echo "::error::These repository secrets are EMPTY or missing:$missing (check exact names on the Secrets tab under Settings > Secrets and variables > Actions)"; exit 1
+            echo "::error::These repository secrets are EMPTY or missing:$missing (add them under Settings > Secrets and variables > Actions. SFTP_PASSWORD must be on the Secrets tab; the others may be Secrets or Variables)"; exit 1
           fi
           echo "All 6 SFTP secrets are set."
 
       - name: Trust the server's host key
         env:
-          KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+          KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS || vars.SFTP_KNOWN_HOSTS }}
         run: |
           if [ -z "$KNOWN_HOSTS" ]; then echo "::error::SFTP_KNOWN_HOSTS secret is missing (see DEPLOY.md)"; exit 1; fi
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
@@ -66,11 +66,11 @@ jobs:
       # Stops a wrong SFTP_DIR from scattering files anywhere else on the server.
       - name: Confirm the target is the site folder
         env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_HOST: ${{ secrets.SFTP_HOST || vars.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT || vars.SFTP_PORT }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME || vars.SFTP_USERNAME }}
           LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_DIR: ${{ secrets.SFTP_DIR }}
+          SFTP_DIR: ${{ secrets.SFTP_DIR || vars.SFTP_DIR }}
         run: |
           # Explain failures without ever printing the password (GitHub also masks secrets).
           diag() {
@@ -101,11 +101,11 @@ jobs:
       - name: Upload changed files
         if: ${{ (github.event_name == 'push' && vars.DEPLOY_LIVE == 'true') || (github.event_name == 'workflow_dispatch' && !inputs.check_only) }}
         env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_HOST: ${{ secrets.SFTP_HOST || vars.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT || vars.SFTP_PORT }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME || vars.SFTP_USERNAME }}
           LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}   # read by lftp --env-password, never printed
-          SFTP_DIR: ${{ secrets.SFTP_DIR }}
+          SFTP_DIR: ${{ secrets.SFTP_DIR || vars.SFTP_DIR }}
         run: |
           lftp -c "
             set net:max-retries 2;
