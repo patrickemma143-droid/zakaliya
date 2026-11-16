@@ -36,7 +36,7 @@ GitHub → repository → **Settings → Secrets and variables → Actions → N
 | `SFTP_PORT` | `22` |
 | `SFTP_USERNAME` | Username from step B3 |
 | `SFTP_PASSWORD` | Password from step B3 |
-| `SFTP_DIR` | Site folder from step B5, ending with `/` (e.g. `/html/`) |
+| `SFTP_DIR` | `./` (the folder the SFTP login opens in; on this site it contains `wp-config.php`) |
 | `SFTP_KNOWN_HOSTS` | The server's host key line (see below) |
 
 **SFTP_KNOWN_HOSTS** pins the server's identity so uploads can't be redirected to a fake server.
@@ -47,12 +47,18 @@ Get it by running this on any computer with OpenSSH (Windows 10/11 PowerShell ha
 Paste the whole output into the secret. (The host key is public, not a password.)
 Never paste the password into chat, email, or any file in the repository.
 
-## D. Go live
+## D. Check first, then go live
+**Safety switch:** a push only *checks* the server (connects and confirms `wp-config.php` is in `SFTP_DIR`) until the
+repository **variable** `DEPLOY_LIVE` is `true` (GitHub → Settings → Secrets and variables → Actions → **Variables** tab).
+A manual run (Actions → Deploy via SFTP → Run workflow) is also check-only unless you untick **Check only**.
+Every upload is refused if `wp-config.php` is not in the target folder.
+
 The site goes live **the moment the first upload finishes** (our `index.html` and `.htaccess` take over), so pick a quiet time,
 ideally after the Stripe links are added.
-1. Push to `main`, or GitHub → **Actions → Deploy via SFTP → Run workflow**.
-2. Flush GoDaddy's cache: **Managed WordPress → Settings → Tools → Flush Cache → Flush Now**. Do this after every upload.
-3. Check: home page, `/about/` → About, `/donations/...` → Donate, a made-up address → "page has moved", padlock on https.
+1. Run the check (push, or Run workflow with **Check only** ticked) and confirm it lists `wp-config.php`.
+2. Go live: add the variable `DEPLOY_LIVE` = `true`, then re-run the workflow (or push).
+3. Flush GoDaddy's cache: **Managed WordPress → Settings → Tools → Flush Cache → Flush Now**. Do this after every upload.
+4. Check: home page, `/about/` → About, `/donations/...` → Donate, a made-up address → "page has moved", padlock on https.
 
 **Undo:** upload the saved WordPress `.htaccess` again and delete our `index.html`; WordPress takes over again.
 

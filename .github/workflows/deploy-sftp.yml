@@ -1,12 +1,19 @@
 name: Deploy via SFTP
 
 # ACTIVE deploy method (GoDaddy Managed WordPress only allows SFTP).
+# Safety switch: a push only CHECKS the server until the repository variable
+# DEPLOY_LIVE is set to true (Settings > Secrets and variables > Actions > Variables).
 # To switch to FTP/FTPS later: move the "push:" trigger below into deploy-ftps.yml
 # and leave only "workflow_dispatch:" here. See DEPLOY.md.
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      check_only:
+        description: "Check only: connect and confirm the site folder, upload nothing"
+        type: boolean
+        default: true
 
 # Never run two uploads at the same time
 concurrency:
@@ -35,7 +42,29 @@ jobs:
           printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
+      # Safety check: only upload into the WordPress site folder (it must contain wp-config.php).
+      # Stops a wrong SFTP_DIR from scattering files anywhere else on the server.
+      - name: Confirm the target is the site folder
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_DIR: ${{ secrets.SFTP_DIR }}
+        run: |
+          listing=$(lftp -c "
+            set net:max-retries 2; set net:timeout 30; set sftp:auto-confirm no;
+            set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
+            open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
+            cls -1 \"$SFTP_DIR\"; bye")
+          echo "Files in the target folder:"; echo "$listing" | sed 's|.*/||' | sort | head -40
+          if ! echo "$listing" | grep -qE '(^|/)wp-config\.php$'; then
+            echo "::error::wp-config.php not found in SFTP_DIR ($SFTP_DIR). Upload stopped. Check the SFTP_DIR secret."; exit 1
+          fi
+          echo "OK: target folder contains wp-config.php"
+
       - name: Upload changed files
+        if: ${{ (github.event_name == 'push' && vars.DEPLOY_LIVE == 'true') || (github.event_name == 'workflow_dispatch' && !inputs.check_only) }}
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
@@ -57,5 +86,11 @@ jobs:
             bye"
           # No --delete: Managed WordPress keeps its own files in the same folder.
 
+      - name: Not live yet
+        if: ${{ github.event_name == 'push' && vars.DEPLOY_LIVE != 'true' }}
+        run: |
+          echo "Check passed. Nothing uploaded. Set the DEPLOY_LIVE variable to true to go live."
+
       - name: Reminder
+        if: ${{ (github.event_name == 'push' && vars.DEPLOY_LIVE == 'true') || (github.event_name == 'workflow_dispatch' && !inputs.check_only) }}
         run: echo "Uploaded. Now flush GoDaddy's cache - Managed WordPress > Settings > Tools > Flush Cache."
