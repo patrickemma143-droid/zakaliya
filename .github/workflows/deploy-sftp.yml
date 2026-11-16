@@ -31,6 +31,11 @@ jobs:
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
+      # A syntax error in the WordPress hand-over file would break the site, so stop before uploading.
+      - name: Check PHP files for errors
+        run: |
+          for f in $(find . -name '*.php' -not -path './.git/*'); do php -l "$f" || exit 1; done
+
       # Only connect to the real server: its identity (host key) is pinned in the
       # SFTP_KNOWN_HOSTS secret, so the upload can't be redirected to an impostor.
       # Reports only "set" or "EMPTY" for each secret, never the values.
