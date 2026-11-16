@@ -36,7 +36,7 @@ GitHub → repository → **Settings → Secrets and variables → Actions → N
 | `SFTP_PORT` | `22` |
 | `SFTP_USERNAME` | Username from step B3 |
 | `SFTP_PASSWORD` | Password from step B3 |
-| `SFTP_DIR` | `./` (the folder the SFTP login opens in; on this site it contains `wp-config.php`) |
+| `SFTP_DIR` | `html/` (the SFTP login opens one level above the site; `html` holds `wp-config.php`) |
 | `SFTP_KNOWN_HOSTS` | The server's host key line (see below) |
 
 **SFTP_KNOWN_HOSTS** pins the server's identity so uploads can't be redirected to a fake server.
