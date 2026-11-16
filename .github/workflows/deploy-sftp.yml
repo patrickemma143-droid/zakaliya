@@ -1,0 +1,61 @@
+name: Deploy via SFTP
+
+# ACTIVE deploy method (GoDaddy Managed WordPress only allows SFTP).
+# To switch to FTP/FTPS later: move the "push:" trigger below into deploy-ftps.yml
+# and leave only "workflow_dispatch:" here. See DEPLOY.md.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two uploads at the same time
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Upload site via SFTP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      # Only connect to the real server: its identity (host key) is pinned in the
+      # SFTP_KNOWN_HOSTS secret, so the upload can't be redirected to an impostor.
+      - name: Trust the server's host key
+        env:
+          KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$KNOWN_HOSTS" ]; then echo "::error::SFTP_KNOWN_HOSTS secret is missing (see DEPLOY.md)"; exit 1; fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Upload changed files
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}   # read by lftp --env-password, never printed
+          SFTP_DIR: ${{ secrets.SFTP_DIR }}
+        run: |
+          lftp -c "
+            set net:max-retries 2;
+            set net:timeout 30;
+            set sftp:auto-confirm no;
+            set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
+            open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
+            mirror --reverse --no-perms --parallel=4 --verbose \
+              --exclude-glob .git* --exclude-glob .git*/ --exclude-glob .github/ \
+              --exclude-glob node_modules/ --exclude-glob README.md --exclude-glob DEPLOY.md \
+              --exclude-glob .env --exclude-glob standalone-rebrand.html \
+              ./ \"$SFTP_DIR\";
+            bye"
+          # No --delete: Managed WordPress keeps its own files in the same folder.
+
+      - name: Reminder
+        run: echo "Uploaded. Now flush GoDaddy's cache - Managed WordPress > Settings > Tools > Flush Cache."

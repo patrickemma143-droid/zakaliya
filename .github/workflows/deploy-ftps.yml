@@ -1,8 +1,10 @@
-name: Deploy to FTPS
+name: Deploy via FTPS (standby)
 
+# STANDBY deploy method for hosting with FTP/FTPS (e.g. a cPanel plan).
+# It only runs when started by hand (Actions > Deploy via FTPS > Run workflow).
+# To make it the active method: add the "push:" trigger back here and remove it
+# from deploy-sftp.yml. See DEPLOY.md.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 # Never run two uploads at the same time
