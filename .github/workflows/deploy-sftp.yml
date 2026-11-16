@@ -38,8 +38,11 @@ jobs:
       # If an edit breaks the build, the job stops here and the live site is untouched.
       - name: Build the website
         run: |
-          npm ci --no-audit --no-fund
-          npx @11ty/eleventy
+          report() { echo "::error::$1: $(tail -n 12 "$2" | tr '\r\n' '  ' | cut -c1-1500)"; }
+          node --version
+          npm ci --no-audit --no-fund > npm.log 2>&1 || { report "npm ci failed" npm.log; exit 1; }
+          npx @11ty/eleventy > build.log 2>&1 || { report "Build failed" build.log; exit 1; }
+          tail -n 3 build.log
           test -f _site/index.html || { echo "::error::Build produced no index.html"; exit 1; }
 
       - name: Install lftp
