@@ -12,7 +12,7 @@ ErrorDocument 404 /404.html
   # Always use https://zakaliyasbm-mn.com (no www). Written without %{...} placeholders,
   # because GoDaddy Managed WordPress doesn't fill them in. (GoDaddy already sends http:// to https://.)
   RewriteCond %{HTTP_HOST} ^www\. [NC]
-  RewriteRule ^(.*)$ https://zakaliyasbm-mn.com/$1 [L,R=301]
+  RewriteRule ^/?(.*)$ https://zakaliyasbm-mn.com/$1 [L,R=301]
 
   # Old WordPress addresses -> matching new pages (keeps old links and search results working)
   RewriteRule ^home/?$ / [L,R=301]
