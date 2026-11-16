@@ -33,6 +33,26 @@ jobs:
 
       # Only connect to the real server: its identity (host key) is pinned in the
       # SFTP_KNOWN_HOSTS secret, so the upload can't be redirected to an impostor.
+      # Reports only "set" or "EMPTY" for each secret, never the values.
+      - name: Check all secrets are present
+        env:
+          S_HOST: ${{ secrets.SFTP_HOST }}
+          S_PORT: ${{ secrets.SFTP_PORT }}
+          S_USER: ${{ secrets.SFTP_USERNAME }}
+          S_PASS: ${{ secrets.SFTP_PASSWORD }}
+          S_DIR: ${{ secrets.SFTP_DIR }}
+          S_KH: ${{ secrets.SFTP_KNOWN_HOSTS }}
+        run: |
+          missing=""
+          for n in HOST PORT USERNAME PASSWORD DIR KNOWN_HOSTS; do
+            case $n in HOST) v=$S_HOST;; PORT) v=$S_PORT;; USERNAME) v=$S_USER;; PASSWORD) v=$S_PASS;; DIR) v=$S_DIR;; KNOWN_HOSTS) v=$S_KH;; esac
+            if [ -z "$(printf '%s' "$v" | tr -d ' \t\r\n')" ]; then missing="$missing SFTP_$n"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::These repository secrets are EMPTY or missing:$missing (check exact names on the Secrets tab under Settings > Secrets and variables > Actions)"; exit 1
+          fi
+          echo "All 6 SFTP secrets are set."
+
       - name: Trust the server's host key
         env:
           KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
