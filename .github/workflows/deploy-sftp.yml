@@ -52,11 +52,26 @@ jobs:
           LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
           SFTP_DIR: ${{ secrets.SFTP_DIR }}
         run: |
+          # Explain failures without ever printing the password (GitHub also masks secrets).
+          diag() {
+            pw_len=${#LFTP_PASSWORD}
+            pw_ws=no; [ "$LFTP_PASSWORD" != "$(printf '%s' "$LFTP_PASSWORD" | tr -d ' \t\r\n')" ] && pw_ws=yes
+            probe=$(ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts \
+                        -o ConnectTimeout=20 -p "${SFTP_PORT:-22}" "$SFTP_USERNAME@$SFTP_HOST" exit 2>&1 | tail -n 2 | tr '\n' ' ')
+            msg="$1 | lftp: $(tail -n 3 /tmp/lftp.err 2>/dev/null | tr '\n' ' ')"
+            msg="$msg | ssh probe (no password): $probe"
+            msg="$msg | password length $pw_len, contains spaces/newlines: $pw_ws | port '${SFTP_PORT:-22}' | dir '$SFTP_DIR'"
+            echo "::error::$msg"
+          }
+          set +e
           listing=$(lftp -c "
             set net:max-retries 2; set net:timeout 30; set sftp:auto-confirm no;
             set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
             open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
-            cls -1 \"$SFTP_DIR\"; bye")
+            cls -1 \"$SFTP_DIR\"; bye" 2>/tmp/lftp.err)
+          rc=$?
+          set -e
+          if [ $rc -ne 0 ]; then diag "Could not connect or list the folder (lftp exit $rc)"; exit 1; fi
           echo "Files in the target folder:"; echo "$listing" | sed 's|.*/||' | sort | head -40
           if ! echo "$listing" | grep -qE '(^|/)wp-config\.php$'; then
             echo "::error::wp-config.php not found in SFTP_DIR ($SFTP_DIR). Upload stopped. Check the SFTP_DIR secret."; exit 1
