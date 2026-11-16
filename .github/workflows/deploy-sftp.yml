@@ -74,14 +74,21 @@ jobs:
         run: |
           # Explain failures without ever printing the password (GitHub also masks secrets).
           diag() {
+            ssh_opts="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=20"
             pw_len=${#LFTP_PASSWORD}
             pw_ws=no; [ "$LFTP_PASSWORD" != "$(printf '%s' "$LFTP_PASSWORD" | tr -d ' \t\r\n')" ] && pw_ws=yes
-            probe=$(ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts \
-                        -o ConnectTimeout=20 -p "${SFTP_PORT:-22}" "$SFTP_USERNAME@$SFTP_HOST" exit 2>&1 | tail -n 2 | tr '\n' ' ')
-            msg="$1 | lftp: $(tail -n 3 /tmp/lftp.err 2>/dev/null | tr '\n' ' ')"
-            msg="$msg | ssh probe (no password): $probe"
-            msg="$msg | password length $pw_len, contains spaces/newlines: $pw_ws | port '${SFTP_PORT:-22}' | dir '$SFTP_DIR'"
-            echo "::error::$msg"
+            user_ws=no; [ "$SFTP_USERNAME" != "$(printf '%s' "$SFTP_USERNAME" | tr -d ' \t\r\n')" ] && user_ws=yes
+            echo "::error::$1 | lftp said: $(tail -n 3 /tmp/lftp.err 2>/dev/null | tr '\r\n' '  ')"
+            echo "::error::Settings: username length ${#SFTP_USERNAME} (spaces/newlines: $user_ws), password length $pw_len (spaces/newlines: $pw_ws), port '${SFTP_PORT:-22}', dir '$SFTP_DIR'"
+            # Which login methods does the server accept? (no password sent)
+            methods=$(ssh $ssh_opts -o BatchMode=yes -o PreferredAuthentications=none -p "${SFTP_PORT:-22}" "$SFTP_USERNAME@$SFTP_HOST" exit 2>&1 \
+                        | grep -v '^\*\*' | tail -n 1 | tr '\r\n' '  ')
+            echo "::error::Server accepts: $methods"
+            # Second opinion with the standard sftp program (password passed via environment, never printed)
+            sudo apt-get install -y -qq sshpass >/dev/null 2>&1
+            second=$(printf 'ls\nbye\n' | SSHPASS="$LFTP_PASSWORD" sshpass -e sftp $ssh_opts -o BatchMode=no -P "${SFTP_PORT:-22}" -b - "$SFTP_USERNAME@$SFTP_HOST" 2>&1 \
+                        | grep -v '^\*\*' | tail -n 2 | tr '\r\n' '  ')
+            echo "::error::Plain sftp login test: $second"
           }
           set +e
           listing=$(lftp -c "
