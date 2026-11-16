@@ -1,0 +1,518 @@
+# Website editor (Pages CMS: https://app.pagescms.org)
+# Defines every form editors see. Saving in the editor commits to GitHub,
+# which rebuilds the site and uploads it automatically.
+
+settings:
+  content:
+    merge: true   # keep any extra settings in a file when an editor saves it
+  commit:
+    identity: user
+    templates:
+      create: "Website edit: add {path} ({userName})"
+      update: "Website edit: {path} ({userName})"
+      delete: "Website edit: remove {path} ({userName})"
+      rename: "Website edit: rename {oldPath} to {newPath} ({userName})"
+
+media:
+  input: assets
+  output: /assets
+  categories: [image]
+  rename: safe
+
+components:
+  photo:
+    type: object
+    label: Photo
+    fields:
+      - name: image
+        label: Photo
+        type: image
+        required: true
+      - name: alt
+        label: Describe the photo
+        type: string
+        required: true
+        description: What's in the photo, for people using screen readers and for Google. Example "Children gathered outside the classroom".
+      - name: caption
+        label: Caption (optional)
+        type: string
+        description: Shown when the photo is opened full screen.
+  seo:
+    type: object
+    label: Google search result
+    fields:
+      - name: title
+        label: Page title
+        type: string
+        required: true
+        description: Shown in the browser tab and as the blue link on Google.
+        options: { maxlength: 90 }
+      - name: description
+        label: Short description
+        type: text
+        description: One or two sentences shown under the link on Google.
+        options: { maxlength: 200 }
+  heading_highlight:
+    type: string
+    label: Highlighted ending (optional)
+    description: Shown in colour right after the heading text. Leave empty for no highlight.
+
+content:
+  # ------------------------------------------------------------------ PAGES
+  - name: pages
+    label: Pages
+    type: group
+    items:
+      - name: home
+        label: Home page
+        type: file
+        path: content/pages/home.yml
+        format: yaml
+        fields:
+          - name: hero
+            label: Top of the page
+            type: object
+            fields:
+              - { name: eyebrow, label: Small line above the heading, type: string }
+              - { name: title, label: Main heading, type: string, required: true }
+              - { name: title_highlight, component: heading_highlight }
+              - { name: text, label: Introduction, type: text }
+              - name: slides
+                label: Background photos
+                type: image
+                description: One or two wide photos. They fade into each other slowly.
+                options: { multiple: { max: 2 } }
+              - { name: button_label, label: Donate button text, type: string }
+              - { name: link_label, label: Projects link text, type: string }
+          - name: intro
+            label: "\"Why we're here\" section"
+            type: object
+            fields:
+              - { name: kicker, label: Small label, type: string }
+              - { name: title, label: Heading, type: string }
+              - name: body
+                label: Text
+                type: rich-text
+                options: { format: markdown, media: false }
+              - { name: verse_text, label: Verse (optional), type: text }
+              - { name: verse_ref, label: Verse reference, type: string, description: "Example: Proverbs 22:9 · NIV" }
+          - name: video
+            label: Video
+            type: object
+            fields:
+              - { name: show, label: Show the video, type: boolean }
+              - { name: kicker, label: Small label, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: youtube_url, label: YouTube link, type: string, description: "Paste the video's address from YouTube, e.g. https://www.youtube.com/watch?v=..." }
+              - { name: video_title, label: Video name (for screen readers), type: string }
+              - { name: link_label, label: Link text, type: string }
+          - name: feature
+            label: Featured story
+            type: object
+            fields:
+              - { name: show, label: Show this section, type: boolean }
+              - { name: title, label: Heading, type: string }
+              - name: body
+                label: Text
+                type: rich-text
+                options: { format: markdown, media: false }
+              - { name: button_label, label: Button text (links to About us), type: string }
+              - { name: image, label: Photo, type: image }
+              - { name: image_alt, label: Describe the photo, type: string }
+              - { name: caption, label: Caption (optional), type: string }
+          - name: completed
+            label: Completed projects section
+            type: object
+            description: The project cards come from Projects (tick "Show on the home page").
+            fields:
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: card_link_label, label: Card link text, type: string }
+              - { name: button_label, label: Button text, type: string }
+          - name: ongoing
+            label: Ongoing projects section
+            type: object
+            description: The project cards come from Projects (tick "Show on the home page").
+            fields:
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: view_label, label: '"View project" button text', type: string }
+              - { name: support_label, label: Support button text, type: string }
+              - { name: button_label, label: Button under the cards, type: string }
+          - name: verse
+            label: Verse of the day
+            type: object
+            description: The verses themselves are edited under "Verse of the day".
+            fields:
+              - { name: show, label: Show this section, type: boolean }
+              - { name: label, label: Section label, type: string }
+          - name: invitation
+            label: Closing donate banner
+            type: object
+            fields:
+              - { name: kicker, label: Small label, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: button_label, label: Button text, type: string }
+          - { name: seo, component: seo }
+
+      - name: about
+        label: About us
+        type: file
+        path: content/pages/about.yml
+        format: yaml
+        fields:
+          - name: hero
+            label: Top of the page
+            type: object
+            fields:
+              - { name: kicker, label: Small label, type: string }
+              - { name: title, label: Main heading, type: string, required: true }
+              - { name: title_highlight, component: heading_highlight }
+              - { name: text, label: Introduction, type: text }
+              - { name: button_label, label: Button text (links to Projects), type: string }
+              - { name: image, label: Photo, type: image }
+              - { name: image_alt, label: Describe the photo, type: string }
+              - { name: caption, label: Caption (optional), type: string }
+          - name: mission
+            label: Our mission
+            type: object
+            fields:
+              - { name: kicker, label: Small label, type: string }
+              - { name: title, label: Heading, type: string }
+              - name: body
+                label: Text
+                type: rich-text
+                options: { format: markdown, media: false }
+              - { name: verse_text, label: Verse (optional), type: text }
+              - { name: verse_ref, label: Verse reference, type: string }
+          - name: founders
+            label: Meet the founders
+            type: object
+            fields:
+              - { name: title, label: Heading, type: string }
+              - name: body
+                label: Text
+                type: rich-text
+                options: { format: markdown, media: false }
+              - { name: link_label, label: Link text (links to Projects), type: string }
+              - { name: image, label: Photo, type: image }
+              - { name: image_alt, label: Describe the photo, type: string }
+              - { name: caption, label: Caption (optional), type: string }
+          - name: recognition
+            label: Recognition / award
+            type: object
+            fields:
+              - { name: show, label: Show this section, type: boolean }
+              - { name: title, label: Heading, type: string }
+              - name: body
+                label: Text
+                type: rich-text
+                options: { format: markdown, media: false }
+              - { name: blessing, label: Closing line (optional), type: string }
+              - { name: gallery_label, label: Photo group name (for screen readers), type: string }
+              - name: photos
+                label: Photos
+                component: photo
+                list: { collapsible: { collapsed: true, summary: "{caption}" } }
+          - name: values
+            label: What guides our work
+            type: object
+            fields:
+              - { name: title, label: Heading, type: string }
+              - name: items
+                label: Values
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{title}" } }
+                fields:
+                  - { name: title, label: Value, type: string, required: true }
+                  - { name: text, label: Description, type: text }
+          - name: invitation
+            label: Closing donate banner
+            type: object
+            fields:
+              - { name: kicker, label: Small label, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: button_label, label: Button text, type: string }
+          - { name: seo, component: seo }
+
+      - name: projects_page
+        label: Projects page
+        type: file
+        path: content/pages/projects.yml
+        format: yaml
+        fields:
+          - name: hero
+            label: Top of the page
+            type: object
+            fields:
+              - { name: kicker, label: Small label, type: string }
+              - { name: title, label: Main heading, type: string, required: true }
+              - { name: title_highlight, component: heading_highlight }
+              - { name: text, label: Introduction, type: text }
+              - { name: button_label, label: Button text (links to Contact), type: string }
+              - { name: image, label: Background photo, type: image }
+              - { name: image_alt, label: Describe the photo, type: string }
+          - name: completed
+            label: Completed projects heading
+            type: object
+            fields:
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: index_label, label: Name in the jump-to bar, type: string }
+          - name: ongoing
+            label: Ongoing projects heading
+            type: object
+            fields:
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: index_label, label: Name in the jump-to bar, type: string }
+              - { name: details_label, label: '"View project details" link text', type: string }
+          - name: invitation
+            label: Closing donate banner
+            type: object
+            fields:
+              - { name: kicker, label: Small label, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: button_label, label: Button text, type: string }
+          - { name: seo, component: seo }
+
+      - name: donate
+        label: Donate page
+        type: file
+        path: content/pages/donate.yml
+        format: yaml
+        fields:
+          - name: hero
+            label: Top of the page
+            type: object
+            fields:
+              - { name: title, label: Main heading, type: string, required: true }
+              - { name: title_highlight, component: heading_highlight }
+              - { name: text, label: Introduction, type: text }
+              - { name: image, label: Photo, type: image }
+              - { name: image_alt, label: Describe the photo, type: string }
+              - { name: fallback_button_label, label: Button shown when no Stripe links are set, type: string }
+              - { name: link_label, label: Projects link text, type: string }
+              - { name: secure_note, label: Security note under the donate button, type: text }
+          - name: stripe
+            label: Stripe donation links
+            type: object
+            description: "Paste Stripe Payment Links (they start with https://buy.stripe.com/). Leave a link empty to hide that amount. Never paste a Stripe secret key here."
+            fields:
+              - { name: currency, label: Currency symbol, type: string }
+              - name: once
+                label: One-time amounts
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{amount}" } }
+                fields:
+                  - { name: amount, label: Amount, type: number, required: true, options: { min: 1 } }
+                  - { name: url, label: Stripe Payment Link, type: string, pattern: { regex: "^(https://buy\\.stripe\\.com/[A-Za-z0-9_-]+(\\?.*)?)?$", message: "Must be a Stripe link starting with https://buy.stripe.com/" } }
+              - { name: once_other_url, label: '"Other amount" Stripe link (customer chooses the amount)', type: string, pattern: { regex: "^(https://buy\\.stripe\\.com/[A-Za-z0-9_-]+(\\?.*)?)?$", message: "Must be a Stripe link starting with https://buy.stripe.com/" } }
+              - name: monthly
+                label: Monthly amounts
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{amount}" } }
+                fields:
+                  - { name: amount, label: Amount, type: number, required: true, options: { min: 1 } }
+                  - { name: url, label: Stripe Payment Link (recurring), type: string, pattern: { regex: "^(https://buy\\.stripe\\.com/[A-Za-z0-9_-]+(\\?.*)?)?$", message: "Must be a Stripe link starting with https://buy.stripe.com/" } }
+          - name: uses
+            label: Where your gift goes
+            type: object
+            fields:
+              - { name: title, label: Heading, type: string }
+              - name: items
+                label: Items
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{title}" } }
+                fields:
+                  - { name: title, label: Name, type: string, required: true }
+                  - { name: text, label: Description, type: text }
+              - { name: verse_text, label: Verse (optional), type: text }
+              - { name: verse_ref, label: Verse reference, type: string }
+          - name: other
+            label: '"Give another way" banner'
+            type: object
+            fields:
+              - { name: title, label: Heading, type: string }
+              - { name: text, label: Text, type: text }
+              - { name: button_label, label: Button text (links to Contact), type: string }
+          - { name: seo, component: seo }
+
+      - name: contact
+        label: Contact page
+        type: file
+        path: content/pages/contact.yml
+        format: yaml
+        description: The email, phone and address are edited under "Website settings".
+        fields:
+          - { name: title, label: Main heading, type: string, required: true }
+          - { name: text, label: Introduction, type: text }
+          - name: form
+            label: Message form
+            type: object
+            fields:
+              - { name: name_label, label: Name field label, type: string }
+              - { name: email_label, label: Email field label, type: string }
+              - { name: message_label, label: Message field label, type: string }
+              - { name: button_label, label: Send button text, type: string }
+          - { name: details_title, label: Contact details heading, type: string }
+          - { name: seo, component: seo }
+
+      - name: thank_you
+        label: Thank-you page (after donating)
+        type: file
+        path: content/pages/thank-you.yml
+        format: yaml
+        fields:
+          - { name: title, label: Main heading, type: string, required: true }
+          - { name: title_highlight, component: heading_highlight }
+          - name: body
+            label: Text
+            type: rich-text
+            options: { format: markdown, media: false }
+          - { name: button_label, label: Button text (links to Projects), type: string }
+          - { name: link_label, label: Link text (links to Contact), type: string }
+          - { name: seo, component: seo }
+
+      - name: not_found
+        label: Page-not-found page
+        type: file
+        path: content/pages/not-found.yml
+        format: yaml
+        fields:
+          - { name: title, label: Main heading, type: string, required: true }
+          - { name: title_highlight, component: heading_highlight }
+          - { name: text, label: Text, type: text }
+          - { name: button_label, label: Button text (links to Home), type: string }
+          - { name: link_label, label: Link text (links to Projects), type: string }
+          - { name: seo, component: seo }
+
+  # --------------------------------------------------------------- PROJECTS
+  - name: projects
+    label: Projects
+    type: collection
+    path: content/projects
+    format: yaml
+    filename:
+      template: "{primary}.yml"
+      field: create
+    view:
+      primary: title
+      fields: [title, category, status_label, order]
+      sort: [order, title]
+      default: { sort: order, order: asc }
+    fields:
+      - { name: title, label: Project name, type: string, required: true }
+      - name: category
+        label: Completed or ongoing?
+        type: select
+        required: true
+        options:
+          values:
+            - { name: ongoing, label: Ongoing }
+            - { name: completed, label: Completed }
+      - { name: order, label: Position in lists, type: number, description: "Lower numbers come first.", options: { min: 0 } }
+      - { name: status_label, label: Status label, type: string, description: 'Short tag shown above the name, e.g. "Under construction".' }
+      - { name: show_on_home, label: Show on the home page, type: boolean, default: true }
+      - { name: card_text, label: Short description (home page card), type: text, options: { maxlength: 200 } }
+      - name: summary
+        label: Description (Projects page)
+        type: rich-text
+        options: { format: markdown, media: false }
+      - { name: image, label: Main photo, type: image, required: true }
+      - { name: image_alt, label: Describe the main photo, type: string, required: true }
+      - { name: image_focus_top, label: Keep the top of the photo in view, type: boolean, description: "Turn on for tall photos where the subject is near the top." }
+      - { name: home_image, label: Home page photo (optional), type: image, description: "Only if the home page card should use a different photo." }
+      - { name: home_image_alt, label: Describe the home page photo, type: string }
+      - { name: slideshow, label: Progress slideshow on the Projects page, type: boolean, description: "Turn on to show the progress photos as a slideshow instead of the main photo." }
+      - { name: detail_page, label: Has its own project page, type: boolean, default: true }
+      - { name: lead, label: "Project page: introduction", type: text }
+      - name: facts
+        label: "Project page: quick facts"
+        type: object
+        list: { collapsible: { collapsed: true, summary: "{label}: {value}" } }
+        fields:
+          - { name: label, label: Label, type: string, required: true, description: 'e.g. "Location"' }
+          - { name: value, label: Value, type: string, required: true, description: 'e.g. "Kasozi, Uganda"' }
+      - { name: about_kicker, label: "Project page: about section label", type: string }
+      - { name: about_title, label: "Project page: about heading", type: string }
+      - name: about
+        label: "Project page: about text"
+        type: rich-text
+        options: { format: markdown, media: false }
+      - name: updates
+        label: Progress updates (newest first)
+        type: object
+        description: Add a new update at the top each time there is news.
+        list: { collapsible: { collapsed: true, summary: "{stage}: {title}" } }
+        fields:
+          - { name: stage, label: Stage label, type: string, description: 'e.g. "Latest update", "Construction update"' }
+          - { name: title, label: Headline, type: string, required: true }
+          - { name: date, label: Date (optional), type: date, default: "", options: { format: yyyy-MM-dd } }
+          - { name: date_note, label: Text if there's no date, type: string, description: 'e.g. "Date not recorded"' }
+          - { name: text, label: What happened, type: text }
+          - name: photos
+            label: Photos
+            component: photo
+            list: { collapsible: { collapsed: true, summary: "{caption}" } }
+      - name: gallery
+        label: Photo gallery
+        component: photo
+        list: { collapsible: { collapsed: true, summary: "{caption}" } }
+      - { name: help_title, label: "Project page: donate banner heading", type: string }
+      - { name: help_text, label: "Project page: donate banner text", type: text }
+      - { name: seo_description, label: Google description (optional), type: text, options: { maxlength: 200 } }
+
+  # ----------------------------------------------------------------- VERSES
+  - name: verses
+    label: Verse of the day
+    type: file
+    path: content/verses.yml
+    format: yaml
+    fields:
+      - { name: translation, label: Bible translation, type: string, description: 'e.g. "KJV"' }
+      - name: verses
+        label: Verses
+        type: object
+        description: One verse is shown each day, in this order.
+        list: { collapsible: { collapsed: true, summary: "{ref}" } }
+        fields:
+          - { name: ref, label: Reference, type: string, required: true, description: "e.g. Galatians 6:9" }
+          - { name: text, label: Verse, type: text, required: true }
+
+  # --------------------------------------------------------------- SETTINGS
+  - name: site
+    label: Website settings
+    type: file
+    path: content/site.yml
+    format: yaml
+    fields:
+      - { name: name, label: Ministry name, type: string, required: true }
+      - { name: tagline, label: Line under the name, type: string }
+      - { name: logo, label: Logo, type: image }
+      - { name: footer_text, label: Footer text, type: text }
+      - { name: footer_note, label: Small footer note, type: string }
+      - name: menu
+        label: Menu labels
+        type: object
+        fields:
+          - { name: home, label: Home, type: string }
+          - { name: about, label: About us, type: string }
+          - { name: projects, label: Projects, type: string }
+          - { name: contact, label: Contact, type: string }
+          - { name: donate, label: Donate button, type: string }
+      - name: contact
+        label: Contact details
+        type: object
+        description: Used on the Contact page and by the message form.
+        fields:
+          - { name: email, label: Email, type: string, required: true }
+          - { name: phone, label: Phone, type: string }
+          - { name: address, label: Address, type: text }
+          - { name: where_we_serve, label: Where we serve, type: string }
+          - { name: facebook, label: Facebook page link, type: string }
+          - { name: youtube, label: YouTube channel link, type: string }

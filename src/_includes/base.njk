@@ -1,0 +1,75 @@
+{%- set menu = site.menu -%}
+{%- set pageSeo = pages[pageKey].seo if (pageKey and pages[pageKey]) else {} -%}
+{%- if pr and pr.title -%}
+{%- set seo = { title: pr.title + " - " + site.name, description: pr.seo_description or pr.lead or pr.card_text or "" } -%}
+{%- else -%}
+{%- set seo = { title: pageSeo.title or site.name, description: pageSeo.description or "" } -%}
+{%- endif -%}
+{%- set links = [
+  { key: "home", url: "/", label: menu.home },
+  { key: "about", url: "/about-us.html", label: menu.about },
+  { key: "projects", url: "/projects.html", label: menu.projects },
+  { key: "contact", url: "/contact.html", label: menu.contact },
+  { key: "donate", url: "/donate.html", label: menu.donate }
+] -%}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#18322a">
+{%- if noindex %}
+  <meta name="robots" content="noindex">
+{%- endif %}
+  <meta name="description" content="{{ seo.description }}">
+  <title>{{ seo.title }}</title>
+{%- if canonical %}
+  <link rel="canonical" href="https://zakaliyasbm-mn.com{{ canonical }}">
+{%- endif %}
+  <link rel="icon" type="image/png" href="{{ site.logo }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/zakaliya.css?v=36">
+{%- for css in extraCss or [] %}
+  <link rel="stylesheet" href="{{ css }}">
+{%- endfor %}
+  <script>document.documentElement.classList.add("js-anim");setTimeout(function(){if(!window.gsap)document.documentElement.classList.remove("js-anim")},3000);</script>
+</head>
+<body>
+  <div class="topline" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="/" aria-label="{{ site.name }} home"><img class="brand-logo" src="{{ site.logo }}" alt="" width="96" height="58"><span><span class="brand-name">{{ site.name }}</span><span class="brand-place">{{ site.tagline }}</span></span></a>
+      <nav class="nav-links" id="primary-navigation" aria-label="Main navigation">{% for l in links %}<a {% if l.key == "donate" %}class="nav-cta" {% endif %}href="{{ l.url }}"{% if l.key == navKey %} aria-current="page"{% endif %}>{{ l.label }}</a>{% endfor %}</nav>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation"><span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span><span>Menu</span></button>
+    </div>
+  </header>
+  <main id="main">
+{{ content | safe }}
+  </main>
+  <footer>
+    <div class="wrap">
+      <div class="footer-main">
+        <div class="footer-brand"><a class="brand" href="/"><img class="brand-logo" src="{{ site.logo }}" alt="" width="96" height="58"><span><span class="brand-name">{{ site.name }}</span><span class="brand-place">{{ site.tagline }}</span></span></a><p>{{ site.footer_text }}</p></div>
+        <nav class="footer-nav" aria-label="Footer navigation">{% for l in links %}<a href="{{ l.url }}"{% if l.key == navKey %} aria-current="page"{% endif %}>{{ l.label }}</a>{% endfor %}</nav>
+      </div>
+      <div class="footer-bottom"><span>© {{ build.year }} {{ site.name }}</span><span>{{ site.footer_note }}</span></div>
+    </div>
+  </footer>
+{%- if inlineScript %}
+  <script>{{ inlineScript | safe }}</script>
+{%- endif %}
+  <script src="/assets/navigation.js?v=1" defer></script>
+{%- for js in scriptsBefore or [] %}
+  <script src="{{ js }}" defer></script>
+{%- endfor %}
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js" defer></script>
+  <script src="/assets/site-motion.js?v=1" defer></script>
+{%- for js in scriptsAfter or [] %}
+  <script src="{{ js }}" defer></script>
+{%- endfor %}
+</body>
+</html>

@@ -28,13 +28,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Builds the pages from /content (edited in the website editor) into /_site.
+      # If an edit breaks the build, the job stops here and the live site is untouched.
+      - name: Build the website
+        run: |
+          npm ci --no-audit --no-fund
+          npx @11ty/eleventy
+          test -f _site/index.html || { echo "::error::Build produced no index.html"; exit 1; }
+
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
       # A syntax error in the WordPress hand-over file would break the site, so stop before uploading.
       - name: Check PHP files for errors
         run: |
-          for f in $(find . -name '*.php' -not -path './.git/*'); do php -l "$f" || exit 1; done
+          for f in $(find _site -name '*.php'); do php -l "$f" || exit 1; done
 
       # Only connect to the real server: its identity (host key) is pinned in the
       # SFTP_KNOWN_HOSTS secret, so the upload can't be redirected to an impostor.
@@ -128,12 +142,9 @@ jobs:
             set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
             open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
             mirror --reverse --no-perms --parallel=4 --verbose \
-              --exclude-glob .git* --exclude-glob .git*/ --exclude-glob .github/ \
-              --exclude-glob node_modules/ --exclude-glob README.md --exclude-glob DEPLOY.md \
-              --exclude-glob .env --exclude-glob standalone-rebrand.html \
-              ./ \"$SFTP_DIR\";
+              _site/ \"$SFTP_DIR\";
             bye"
-          # No --delete: Managed WordPress keeps its own files in the same folder.
+          # Uploads only the built site (_site). No --delete: Managed WordPress keeps its own files in the same folder.
 
       - name: Not live yet
         if: ${{ github.event_name == 'push' && vars.DEPLOY_LIVE != 'true' }}

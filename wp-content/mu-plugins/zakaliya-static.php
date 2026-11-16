@@ -82,6 +82,12 @@ function zakaliya_serve_static($file, $status)
     exit;
 }
 
+// Website editor sign-in page: zakaliyasbm-mn.com/admin (also /edit, /editor, /login)
+if (preg_match('#^/(admin|edit|editor|login)/?$#i', $zk_path)) {
+    header('X-Robots-Tag: noindex, nofollow');
+    zakaliya_serve_static('editor.html', 200);
+}
+
 // Home page: our index.html (only plain "/" with no query, so WordPress callbacks like /?give-listener=... still work)
 if (($zk_path === '/' || $zk_path === '/index.php') && $zk_query === '') {
     zakaliya_serve_static('index.html', 200);

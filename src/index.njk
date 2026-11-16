@@ -1,0 +1,134 @@
+---
+layout: base.njk
+permalink: /index.html
+navKey: home
+pageKey: home
+canonical: /
+scriptsBefore: ["/assets/verse.js?v=2"]
+---
+{%- from "macros.njk" import img, hl -%}
+{%- set p = pages.home -%}
+{%- set completed = projects | where("category", "completed") | where("show_on_home", true) -%}
+{%- set ongoing = projects | where("category", "ongoing") | where("show_on_home", true) -%}
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-backdrop" aria-hidden="true">
+{%- for slide in p.hero.slides %}{% if loop.index <= 2 %}{% set d = slide | dims %}
+        <img class="hero-slide {{ 'hero-slide-child' if loop.first else 'hero-slide-girls' }}" src="{{ slide }}" alt=""{% if d %} width="{{ d.w }}" height="{{ d.h }}"{% endif %}{% if loop.first %} fetchpriority="high"{% endif %} decoding="async">
+{%- endif %}{% endfor %}
+      </div>
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow">{{ p.hero.eyebrow }}</span>
+          <h1 id="hero-title">{{ hl(p.hero.title, p.hero.title_highlight) }}</h1>
+          <p>{{ p.hero.text }}</p>
+          <div class="hero-actions"><a class="button" href="/donate.html">{{ p.hero.button_label }}</a><a class="text-link" href="/projects.html">{{ p.hero.link_label }} <span aria-hidden="true">&rarr;</span></a></div>
+        </div>
+      </div>
+    </section>
+    <section class="intro" id="story" aria-labelledby="story-title">
+      <div class="wrap intro-grid">
+        <div><p class="section-kicker">{{ p.intro.kicker }}</p><h2 id="story-title">{{ p.intro.title }}</h2></div>
+        <div class="intro-copy">
+          {{ p.intro.body | md | safe }}
+{%- if p.intro.verse_text %}
+          <div class="mission-verse"><blockquote>{{ p.intro.verse_text }}<cite>{{ p.intro.verse_ref }}</cite></blockquote></div>
+{%- endif %}
+        </div>
+      </div>
+{%- if p.video.show and (p.video.youtube_url | youtubeId) %}
+      {%- set vid = p.video.youtube_url | youtubeId %}
+      <div class="wrap story-video">
+        <div class="story-video-copy">
+          <p class="section-kicker">{{ p.video.kicker }}</p>
+          <h3>{{ p.video.title }}</h3>
+          <p>{{ p.video.text }}</p>
+          <a class="video-link" href="https://www.youtube.com/watch?v={{ vid }}" target="_blank" rel="noopener noreferrer">{{ p.video.link_label }} <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="video-frame">
+          <iframe src="https://www.youtube.com/embed/{{ vid }}?controls=1&amp;rel=0&amp;playsinline=0&amp;autoplay=0" title="{{ p.video.video_title }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+      </div>
+{%- endif %}
+    </section>
+{%- if p.feature.show %}
+    <section class="about-brief" id="about" aria-labelledby="about-brief-title">
+      <div class="wrap about-brief-grid">
+        <div class="about-brief-copy">
+          <h2 id="about-brief-title">{{ p.feature.title }}</h2>
+          {{ p.feature.body | md | safe }}
+          <a class="button" href="/about-us.html">{{ p.feature.button_label }}</a>
+        </div>
+{%- if p.feature.image %}
+        <figure class="about-brief-photo">
+          {{ img(p.feature.image, p.feature.image_alt) }}
+{%- if p.feature.caption %}
+          <figcaption>{{ p.feature.caption }}</figcaption>
+{%- endif %}
+        </figure>
+{%- endif %}
+      </div>
+    </section>
+{%- endif %}
+{%- if completed.length %}
+    <section class="home-projects" id="projects" aria-labelledby="home-projects-title">
+      <div class="wrap">
+        <h2 id="home-projects-title">{{ p.completed.title }}</h2>
+        <p class="home-projects-lead">{{ p.completed.text }}</p>
+        <div class="home-proj-grid home-completed-grid">
+{%- for pr in completed %}
+          <article class="hp-card">
+            {{ img(pr.home_image or pr.image, pr.home_image_alt or pr.image_alt) }}
+            <div class="hp-copy"><h3>{{ pr.title }}</h3><p>{{ pr.card_text }}</p><a class="hp-link" href="/projects.html#{{ pr.slug }}">{{ p.completed.card_link_label }} <span aria-hidden="true">↗</span></a></div>
+          </article>
+{%- endfor %}
+        </div>
+        <a class="button" href="/projects.html#completed-projects">{{ p.completed.button_label }}</a>
+      </div>
+    </section>
+{%- endif %}
+{%- if ongoing.length %}
+    <section class="home-ongoing" id="ongoing-projects" aria-labelledby="ongoing-projects-title">
+      <div class="wrap">
+        <div class="home-ongoing-heading">
+          <h2 id="ongoing-projects-title">{{ p.ongoing.title }}</h2>
+          <p>{{ p.ongoing.text }}</p>
+        </div>
+        <div class="home-ongoing-grid">
+{%- for pr in ongoing %}
+          <article class="hp-card home-project-card">
+            <div class="home-project-card-media">{{ img(pr.image, pr.image_alt, "img-focus-top" if pr.image_focus_top else "") }}</div>
+            <div class="hp-copy"><p class="home-project-status"><span aria-hidden="true"></span>{{ pr.status_label }}</p><h3>{{ pr.title }}</h3><p>{{ pr.card_text }}</p><div class="home-project-actions"><a class="home-project-button" href="{{ pr.url }}">{{ p.ongoing.view_label }}</a><a class="home-project-button home-project-button-primary" href="/donate.html">{{ p.ongoing.support_label }}</a></div></div>
+          </article>
+{%- endfor %}
+        </div>
+        <a class="button home-ongoing-cta" href="/projects.html">{{ p.ongoing.button_label }}</a>
+      </div>
+    </section>
+{%- endif %}
+{%- if p.verse.show and verses.verses.length %}
+    {%- set first = verses.verses[0] %}
+    <section class="daily-verse" id="daily-verse" aria-labelledby="daily-verse-title">
+      <div class="wrap dv-grid">
+        <div class="dv-side">
+          <p class="dv-kicker" id="daily-verse-title">{{ p.verse.label }}</p>
+          <p class="dv-date" data-verse-date>Today</p>
+          <div class="dv-actions">
+            <button class="dv-btn dv-btn-main" type="button" data-verse-next>Next verse <span aria-hidden="true">&rarr;</span></button>
+            <button class="dv-btn" type="button" data-verse-copy><span>Copy verse</span></button>
+          </div>
+          <p class="dv-count" data-verse-count>Verse 1 of {{ verses.verses.length }}</p>
+        </div>
+        <div class="dv-body" data-verse-body aria-live="polite">
+          <span class="dv-mark" aria-hidden="true">&ldquo;</span>
+          <blockquote class="dv-quote"><p data-verse-text>{{ first.text }}</p><cite data-verse-ref>{{ first.ref }} &middot; {{ verses.translation }}</cite></blockquote>
+        </div>
+      </div>
+      <script>window.ZAKALIYA_VERSES={{ verses | json | safe }};</script>
+    </section>
+{%- endif %}
+    <section class="invitation" id="contact" aria-labelledby="invitation-title">
+      <div class="wrap invitation-inner">
+        <div><p class="section-kicker">{{ p.invitation.kicker }}</p><h2 id="invitation-title">{{ p.invitation.title }}</h2><p>{{ p.invitation.text }}</p></div>
+        <a class="button button-dark" href="/donate.html">{{ p.invitation.button_label }}</a>
+      </div>
+    </section>

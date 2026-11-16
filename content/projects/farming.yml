@@ -1,0 +1,34 @@
+title: Farming Project
+category: ongoing
+order: 4
+status_label: Community livelihoods
+card_text: Growing skills and shared effort can help strengthen local livelihoods and support families.
+summary: Growing skills and shared effort can help strengthen local livelihoods and support families.
+image: /assets/farming-poultry.jpg
+image_alt: Brown laying hens leaning out to feed at a trough in a poultry house
+image_focus_top: true
+show_on_home: true
+slideshow: false
+detail_page: true
+seo_description: 'The Farming Project in Kasozi, Uganda: growing skills and livelihoods that support families.'
+lead: Growing skills and shared effort can help strengthen local livelihoods and support families.
+facts:
+  - label: Location
+    value: Kasozi, Uganda
+  - label: For
+    value: Families in the community
+  - label: Focus
+    value: Farming and poultry
+about_kicker: About the project
+about_title: Growing livelihoods together.
+about: |-
+  Growing skills and shared effort can help strengthen local livelihoods and support families.
+
+  The project includes poultry keeping, building practical skills that can help families in Kasozi.
+updates: []
+gallery:
+  - image: /assets/farming-poultry.jpg
+    alt: Brown laying hens leaning out to feed at a trough in a poultry house
+    caption: Poultry keeping is part of the Farming Project
+help_title: Help families grow their livelihoods.
+help_text: Your gift helps the Farming Project grow and supports families in Kasozi.

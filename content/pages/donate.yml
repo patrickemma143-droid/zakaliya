@@ -1,0 +1,46 @@
+seo:
+  title: Donate - Zakaliya Shared Blessings Ministry
+  description: Donate to Zakaliya Shared Blessings Ministry and help children, classrooms and skills projects in Kasozi, Uganda.
+hero:
+  title: Your gift reaches
+  title_highlight: Kasozi.
+  text: Every donation helps children learn, builds classrooms, and opens new skills for young people.
+  image: /assets/kids-support.jpg
+  image_alt: Children gathered outside a ministry building in Kasozi
+  fallback_button_label: Contact us to give
+  link_label: See where it goes
+  secure_note: Secure checkout by Stripe. Your card details go straight to Stripe; we never see or store them.
+stripe:
+  currency: $
+  once:
+    - amount: 25
+      url: ''
+    - amount: 50
+      url: ''
+    - amount: 100
+      url: ''
+    - amount: 250
+      url: ''
+  once_other_url: ''
+  monthly:
+    - amount: 25
+      url: ''
+    - amount: 50
+      url: ''
+    - amount: 100
+      url: ''
+uses:
+  title: Where your gift goes
+  items:
+    - title: Kids Support Program
+      text: Educational scholarships, school supplies, nutritional support and access to healthcare for children.
+    - title: Pre-School Construction
+      text: A three-block classroom for children aged 3 to 6, now under construction.
+    - title: Skills for young people
+      text: Our ongoing tailoring and farming projects, giving young people in Kasozi practical skills.
+  verse_text: “The generous will themselves be blessed, for they share their food with the poor.”
+  verse_ref: Proverbs 22:9, NIV
+other:
+  title: Prefer to give another way?
+  text: Write to us or call, and we will gladly help you.
+  button_label: Contact us

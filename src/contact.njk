@@ -1,0 +1,57 @@
+---
+layout: base.njk
+permalink: /contact.html
+navKey: contact
+pageKey: contact
+canonical: /contact.html
+---
+{%- set p = pages.contact -%}
+{%- set c = site.contact -%}
+    <section class="ct-hero" aria-labelledby="ct-title">
+      <div class="wrap ct-grid">
+        <div class="ct-form-wrap">
+          <h1 id="ct-title">{{ p.title }}</h1>
+          <p class="ct-lead">{{ p.text }}</p>
+          <form class="ct-form" id="contact-form" novalidate data-to="{{ c.email }}">
+            <div class="field"><label for="cf-name">{{ p.form.name_label }}</label><input id="cf-name" name="name" type="text" autocomplete="name" required aria-describedby="cf-name-err"><p class="field-error" id="cf-name-err" hidden>Please enter your name.</p></div>
+            <div class="field"><label for="cf-email">{{ p.form.email_label }}</label><input id="cf-email" name="email" type="email" autocomplete="email" required aria-describedby="cf-email-err"><p class="field-error" id="cf-email-err" hidden>Please enter a valid email address.</p></div>
+            <div class="field"><label for="cf-msg">{{ p.form.message_label }}</label><textarea id="cf-msg" name="message" rows="6" required aria-describedby="cf-msg-err"></textarea><p class="field-error" id="cf-msg-err" hidden>Please write a short message.</p></div>
+            <button class="button" type="submit">{{ p.form.button_label }}</button>
+            <p class="form-note" id="cf-note" role="status" hidden>Your email app should open with the message ready to send. If it does not, write to <a href="mailto:{{ c.email }}">{{ c.email }}</a>.</p>
+          </form>
+        </div>
+        <aside class="ct-details" aria-label="Contact details">
+          <h2>{{ p.details_title }}</h2>
+          <dl>
+{%- if c.email %}
+            <div><dt>Email</dt><dd><a href="mailto:{{ c.email }}">{{ c.email }}</a></dd></div>
+{%- endif %}{% if c.phone %}
+            <div><dt>Phone</dt><dd><a href="{{ c.phone | tel }}">{{ c.phone }}</a></dd></div>
+{%- endif %}{% if c.address %}
+            <div><dt>Address</dt><dd>{% for line in c.address | lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</dd></div>
+{%- endif %}{% if c.where_we_serve %}
+            <div><dt>Where we serve</dt><dd>{{ c.where_we_serve }}</dd></div>
+{%- endif %}
+          </dl>
+          <div class="ct-social">{% if c.facebook %}<a href="{{ c.facebook }}" target="_blank" rel="noopener noreferrer">Facebook</a>{% endif %}{% if c.youtube %}<a href="{{ c.youtube }}" target="_blank" rel="noopener noreferrer">YouTube</a>{% endif %}</div>
+        </aside>
+      </div>
+    </section>
+    <script>
+(function(){
+  var f=document.getElementById('contact-form'); if(!f) return;
+  var TO=f.getAttribute('data-to');
+  function show(id,bad){var e=document.getElementById(id); if(e) e.hidden=!bad;}
+  f.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var n=f.elements.name.value.trim(), m=f.elements.email.value.trim(), t=f.elements.message.value.trim();
+    var okN=n.length>0, okE=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m), okM=t.length>0;
+    show('cf-name-err',!okN); show('cf-email-err',!okE); show('cf-msg-err',!okM);
+    f.elements.name.setAttribute('aria-invalid',!okN); f.elements.email.setAttribute('aria-invalid',!okE); f.elements.message.setAttribute('aria-invalid',!okM);
+    if(!(okN&&okE&&okM)) return;
+    var body=t+'\n\nFrom: '+n+' ('+m+')';
+    window.location.href='mailto:'+TO+'?subject='+encodeURIComponent('Message from '+n+' via the website')+'&body='+encodeURIComponent(body);
+    document.getElementById('cf-note').hidden=false;
+  });
+})();
+    </script>

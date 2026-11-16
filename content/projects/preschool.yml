@@ -1,0 +1,68 @@
+title: Preschool Extension
+category: ongoing
+order: 5
+status_label: Under construction
+card_text: A new three-block classroom is being added as pupil numbers grow, creating room for more children to learn.
+summary: 'The Pre-School Construction project is building a safe, welcoming place for young children in Kasozi, Uganda, to learn. **The two-block classroom is complete, and because pupil numbers have grown, we are now adding a three-block classroom.** The new pre-school will give children aged 3 to 6 quality early education and room to develop, with classrooms equipped with learning materials and outdoor play areas where young learners can grow, explore, and thrive.'
+image: /assets/preschool-roofed.jpg
+image_alt: The new pre-school classroom block, now roofed with doors and windows, with colourful playground equipment in front
+image_focus_top: false
+show_on_home: true
+slideshow: true
+detail_page: true
+seo_description: 'Follow the Preschool Extension in Kasozi, Uganda: progress updates and photos of the new three-block classroom.'
+lead: A new three-block classroom so more young children in Kasozi have room to learn.
+facts:
+  - label: Location
+    value: Kasozi, Uganda
+  - label: For
+    value: Children aged 3 to 6
+  - label: Status
+    value: Under construction
+  - label: Latest stage
+    value: Roofed, with doors and windows
+about_kicker: About the project
+about_title: Room for more children to learn.
+about: |-
+  The Pre-School Construction project is building a safe, welcoming place for young children in Kasozi, Uganda, to learn.
+
+  **The two-block classroom is complete, and because pupil numbers have grown, we are now adding a three-block classroom.**
+
+  The new pre-school will give children aged 3 to 6 quality early education and room to develop, with classrooms equipped with learning materials and outdoor play areas where young learners can grow, explore, and thrive.
+updates:
+  - stage: Latest update
+    title: Roofed, with doors, windows and a playground
+    date_note: Most recent photo
+    text: The new classroom block now has its roof, doors and windows in place, and colourful playground equipment has been set up in front for the children.
+    photos:
+      - image: /assets/preschool-roofed.jpg
+        alt: The new pre-school classroom block, now roofed with doors and windows, with colourful playground equipment in front
+        caption: 'Latest: the new block roofed, with doors, windows and a playground'
+  - stage: Construction update
+    title: Three-block classroom underway
+    date: '2025-06-04'
+    text: Construction of the three-block classroom was underway as pupil numbers continued to grow.
+    photos:
+      - image: /assets/preschool-project.jpg
+        alt: The three-block pre-school classroom under construction
+        caption: '4 June 2025: the three-block classroom underway'
+  - stage: Earlier phase
+    title: Two-block classroom completed
+    date_note: Date not recorded
+    text: The first two classrooms were completed and are in use, the first phase of the ministry's education project.
+    photos:
+      - image: /assets/classroom-construction.jpg
+        alt: The completed two-block classroom, the earlier phase of the education project
+        caption: 'Earlier phase: the two-block classroom, completed and in use'
+gallery:
+  - image: /assets/preschool-roofed.jpg
+    alt: The new pre-school classroom block, now roofed with doors and windows, with colourful playground equipment in front
+    caption: 'Latest: the new block roofed, with doors, windows and a playground'
+  - image: /assets/preschool-project.jpg
+    alt: The three-block pre-school classroom under construction
+    caption: '4 June 2025: the three-block classroom underway'
+  - image: /assets/classroom-construction.jpg
+    alt: The completed two-block classroom, the earlier phase of the education project
+    caption: 'Earlier phase: the two-block classroom, completed and in use'
+help_title: Help finish the new classrooms.
+help_text: Your gift helps complete the classrooms and equip them with learning materials and outdoor play areas for young children.

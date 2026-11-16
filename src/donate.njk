@@ -1,0 +1,58 @@
+---
+layout: base.njk
+permalink: /donate.html
+navKey: donate
+pageKey: donate
+canonical: /donate.html
+extraCss: ["/assets/donate.css?v=1"]
+scriptsBefore: ["/assets/donate.js?v=2"]
+---
+{%- from "macros.njk" import img, hl -%}
+{%- set p = pages.donate -%}
+    <section class="don-hero" aria-labelledby="don-title">
+      <div class="wrap don-hero-inner">
+        <div class="don-hero-copy">
+          <h1 id="don-title">{{ hl(p.hero.title, p.hero.title_highlight) }}</h1>
+          <p>{{ p.hero.text }}</p>
+          <div class="give" data-give hidden>
+            <div class="give-freq" data-give-freq role="group" aria-label="How often" hidden><button type="button" data-freq="once" aria-pressed="true">Give once</button><button type="button" data-freq="monthly" aria-pressed="false">Monthly</button></div>
+            <div class="give-amounts" data-give-amounts role="group" aria-label="Choose an amount"></div>
+            <a class="button don-button give-cta" data-give-cta href="#">Donate securely</a>
+            <p class="give-note" data-give-note></p>
+            <p class="give-secure"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>{{ p.hero.secure_note }}</p>
+          </div>
+          <div class="hero-actions"><a class="button don-button" data-legacy-donate href="/contact.html">{{ p.hero.fallback_button_label }}</a><a class="text-link" href="/projects.html">{{ p.hero.link_label }} <span aria-hidden="true">&rarr;</span></a></div>
+        </div>
+{%- if p.hero.image %}
+        <figure class="don-hero-media">{{ img(p.hero.image, p.hero.image_alt, "", "", true) }}</figure>
+{%- endif %}
+      </div>
+    </section>
+    <section class="don-use" aria-labelledby="use-title">
+      <div class="wrap don-use-grid">
+        <div class="don-use-copy">
+          <h2 id="use-title">{{ p.uses.title }}</h2>
+          <dl class="don-list">
+{%- for u in p.uses.items %}
+            <div><dt>{{ u.title }}</dt><dd>{{ u.text }}</dd></div>
+{%- endfor %}
+          </dl>
+        </div>
+{%- if p.uses.verse_text %}
+        <aside class="don-verse" aria-label="A verse that guides the ministry">
+          <blockquote>{{ p.uses.verse_text }}<cite>{{ p.uses.verse_ref }}</cite></blockquote>
+        </aside>
+{%- endif %}
+      </div>
+    </section>
+    <section class="don-other" aria-labelledby="other-title">
+      <div class="wrap don-other-inner">
+        <div>
+          <h2 id="other-title">{{ p.other.title }}</h2>
+          <p>{{ p.other.text }}</p>
+        </div>
+        <a class="button button-dark" href="/contact.html">{{ p.other.button_label }}</a>
+      </div>
+    </section>
+    {#- Stripe Payment Links from the editor. donate.js only accepts https://buy.stripe.com/ links. #}
+    <script>window.ZAKALIYA_DONATE={{ { currency: p.stripe.currency or "$", once: p.stripe.once or [], onceOther: p.stripe.once_other_url or "", monthly: p.stripe.monthly or [] } | json | safe }};</script>

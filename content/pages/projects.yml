@@ -1,0 +1,25 @@
+seo:
+  title: Projects - Zakaliya Shared Blessings Ministry
+  description: Explore the children’s support, classroom, pre-school, and church building projects of Zakaliya Shared Blessings Ministry.
+hero:
+  kicker: Sharing blessings through action
+  title: Our
+  title_highlight: Projects
+  text: From supporting children to building places to learn and gather, each project helps create opportunities for the community.
+  button_label: Support the work
+  image: /assets/projects-hero-children.jpg
+  image_alt: A group of schoolchildren and a teacher gathered outside their school
+completed:
+  title: Completed projects
+  text: Lasting places for worship, learning, and connection.
+  index_label: Completed projects
+ongoing:
+  title: Ongoing projects
+  text: Care and construction that continue to open new possibilities.
+  index_label: Ongoing projects
+  details_label: View project details
+invitation:
+  kicker: Be part of the journey
+  title: Your generosity can help this work grow.
+  text: Every act of support helps the ministry continue its programs and building projects.
+  button_label: Donate

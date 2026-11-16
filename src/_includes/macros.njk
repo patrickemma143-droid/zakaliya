@@ -1,0 +1,15 @@
+{#- An <img> with width/height read from the file, so the page doesn't jump while loading. -#}
+{%- macro img(src, alt="", cls="", loading="lazy", priority=false) -%}
+{%- set d = src | dims -%}
+<img{% if cls %} class="{{ cls }}"{% endif %} src="{{ src }}" alt="{{ alt }}"{% if d %} width="{{ d.w }}" height="{{ d.h }}"{% endif %}{% if priority %} fetchpriority="high"{% elif loading %} loading="{{ loading }}"{% endif %} decoding="async">
+{%- endmacro -%}
+
+{#- A heading with an optional highlighted ending, e.g. "A little support can open a <em>big door.</em>" -#}
+{%- macro hl(title, highlight) -%}
+{{ title }}{% if highlight %} <em>{{ highlight }}</em>{% endif %}
+{%- endmacro -%}
+
+{#- Photo thumbnail that opens in the full-screen viewer -#}
+{%- macro thumb(photo) -%}
+<a class="pd-thumb" href="{{ photo.image }}" data-lightbox data-caption="{{ photo.caption }}">{{ img(photo.image, photo.alt) }}</a>
+{%- endmacro -%}

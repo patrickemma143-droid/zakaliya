@@ -20,9 +20,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build the website
+        run: |
+          npm ci --no-audit --no-fund
+          npx @11ty/eleventy
+
       - name: Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
+          local-dir: ./_site/
           server: ${{ secrets.FTP_SERVER }}            # the host's FTP server name, e.g. ftp.zakaliyasbm-mn.com
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}

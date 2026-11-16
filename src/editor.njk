@@ -1,0 +1,39 @@
+---
+permalink: /editor.html
+eleventyExcludeFromCollections: true
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#18322a">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Website editor - {{ site.name }}</title>
+  <link rel="icon" type="image/png" href="{{ site.logo }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/zakaliya.css?v=36">
+  <link rel="stylesheet" href="/assets/editor.css?v=1">
+</head>
+<body class="ed-body">
+  <div class="topline" aria-hidden="true"></div>
+  <main class="ed-main" id="main">
+    <div class="ed-card">
+      <a class="ed-brand" href="/"><img src="{{ site.logo }}" alt="" width="96" height="58"><span><strong>{{ site.name }}</strong><small>Website editor</small></span></a>
+      <h1>Sign in to edit the website</h1>
+      <p class="ed-lead">Update text, photos, projects, progress updates, verses and donation links. Only people invited by the website admin can sign in.</p>
+      <a class="button ed-button" href="https://app.pagescms.org/" rel="noopener">Sign in <span aria-hidden="true">&rarr;</span></a>
+      <ol class="ed-steps">
+        <li><strong>Click Sign in.</strong> The editor opens in this window.</li>
+        <li><strong>Choose &ldquo;Continue with email&rdquo;</strong> and enter the email address you were invited with.</li>
+        <li><strong>Open the sign-in link</strong> we email you, then choose the Zakaliya website.</li>
+      </ol>
+      <p class="ed-note">After you click <strong>Save</strong>, your changes appear on the website within a few minutes. Every change is kept in history and can be undone.</p>
+      <p class="ed-help">Need access or stuck? Email <a href="mailto:{{ site.contact.email }}">{{ site.contact.email }}</a>.</p>
+    </div>
+    <a class="ed-back" href="/">&larr; Back to the website</a>
+  </main>
+</body>
+</html>

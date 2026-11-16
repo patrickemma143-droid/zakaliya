@@ -1,0 +1,48 @@
+title: Tailoring Project
+category: ongoing
+order: 3
+status_label: Skills for young people
+card_text: Practical tailoring skills can open new opportunities for young people and their families.
+summary: Practical tailoring skills can open new opportunities for young people and their families.
+image: /assets/tailoring-progress-01.jpg
+image_alt: The tailoring project building taking shape, viewed from the side
+image_focus_top: false
+show_on_home: true
+slideshow: false
+detail_page: true
+seo_description: 'The Tailoring Project in Kasozi, Uganda: building a place where young people can learn practical tailoring skills.'
+lead: Practical tailoring skills can open new opportunities for young people and their families.
+facts:
+  - label: Location
+    value: Kasozi, Uganda
+  - label: For
+    value: Young people and their families
+  - label: Status
+    value: Building under construction
+about_kicker: About the project
+about_title: Skills that open doors.
+about: |-
+  Practical tailoring skills can open new opportunities for young people and their families.
+
+  We are building a place in Kasozi where young people can learn these skills. The building is now taking shape.
+updates:
+  - stage: Construction update
+    title: The building takes shape
+    date_note: Date to be added
+    text: The walls of the tailoring building are going up, with window and door openings in place.
+    photos:
+      - image: /assets/tailoring-progress-01.jpg
+        alt: The tailoring project building taking shape, viewed from the side
+        caption: The tailoring building taking shape, seen from the side
+      - image: /assets/tailoring-progress-02.jpg
+        alt: A second view of the tailoring project building under construction
+        caption: A second view of the building under construction
+gallery:
+  - image: /assets/tailoring-progress-01.jpg
+    alt: The tailoring project building taking shape, viewed from the side
+    caption: The tailoring building taking shape, seen from the side
+  - image: /assets/tailoring-progress-02.jpg
+    alt: A second view of the tailoring project building under construction
+    caption: A second view of the building under construction
+help_title: Help young people learn a trade.
+help_text: Your gift helps complete the tailoring building and prepare it for training.

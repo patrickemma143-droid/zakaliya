@@ -1,0 +1,62 @@
+seo:
+  title: Zakaliya Shared Blessings Ministry - Shared blessings, growing hope
+  description: Zakaliya Shared Blessings Ministry shares blessings and practical support with people in need.
+hero:
+  eyebrow: Shared blessings, a ministry of care
+  title: A little support can open a
+  title_highlight: big door.
+  text: We share blessings with people in need and support opportunities for children, families, and the wider community.
+  slides:
+    - /assets/home-hero-child.jpg
+    - /assets/home-hero-girls.jpg
+  button_label: Donate
+  link_label: See our projects
+intro:
+  kicker: Why we’re here
+  title: Sharing what we have. Making room for hope.
+  body: |-
+    **Zakaliya Shared Blessings Ministry** was founded in 2024 to share donations and support with people in need.
+
+    Our mission is simple: to share blessings with those in need and help create opportunities for growth. We believe generosity can strengthen a community, one act of care at a time.
+  verse_text: “The generous will themselves be blessed, for they share their food with the poor.”
+  verse_ref: Proverbs 22:9 · NIV
+video:
+  show: true
+  kicker: Join us online
+  title: A message of gratitude in every circumstance.
+  text: Watch the ministry’s lunch-hour message on YouTube and Facebook.
+  youtube_url: https://www.youtube.com/watch?v=cpuc3v1D_oY
+  video_title: 'Message: Thank God in every Circumstances - Zakaliya Shared Blessings Ministry'
+  link_label: Watch on YouTube
+feature:
+  show: true
+  title: UGAMN honours our Director, Jennifer Garubanda.
+  body: |-
+    The UGAMN community honoured our Director, Jennifer Garubanda, for her generosity, outstanding service, and meaningful contributions to the Minnesota community. UGAMN President Elvis presented her with the Lifetime Achievement Award.
+
+    On behalf of Zakaliya Shared Blessings Ministry, we thank UGAMN’s leadership and community for this recognition. We congratulate Jennifer and celebrate her continued service as God leads her.
+
+    May God bless you all.
+  button_label: Read our story
+  image: /assets/jennifer-award-presentation.jpg
+  image_alt: UGAMN President Elvis presenting the Lifetime Achievement Award to Zakaliya Shared Blessings Ministry Director Jennifer Garubanda, surrounded by community members
+  caption: UGAMN President Elvis presents Jennifer Garubanda with the Lifetime Achievement Award.
+completed:
+  title: What We’ve Accomplished
+  text: Together with our community, we’ve built places for learning and worship.
+  card_link_label: Explore project
+  button_label: See completed projects
+ongoing:
+  title: Ongoing Projects
+  text: Practical projects that help children learn and give young people skills to build a more secure future.
+  view_label: View project
+  support_label: Be part of this programme
+  button_label: See all projects
+verse:
+  show: true
+  label: Verse of the day
+invitation:
+  kicker: Be part of the journey
+  title: Your generosity can travel a long way.
+  text: Every act of support helps us continue sharing blessings with the community. Join us in this work or learn more about our projects.
+  button_label: Donate

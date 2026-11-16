@@ -8,3 +8,6 @@ Thumbs.db
 # Local backups (not part of the site)
 _original-images/
 _unused-assets/
+
+# Build output
+_site/
