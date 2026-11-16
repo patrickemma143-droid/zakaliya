@@ -129,33 +129,6 @@ jobs:
           fi
           echo "OK: target folder contains wp-config.php"
 
-      # One-time diagnostic (runs only when the commit message contains [inspect-cache]):
-      # reads GoDaddy's must-use system plugin to find how it clears the page cache. Read-only.
-      - name: Inspect GoDaddy cache plugin
-        if: contains(github.event.head_commit.message, '[inspect-cache]')
-        env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST || vars.SFTP_HOST }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT || vars.SFTP_PORT }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME || vars.SFTP_USERNAME }}
-          LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_DIR: ${{ secrets.SFTP_DIR || vars.SFTP_DIR }}
-        run: |
-          mkdir -p /tmp/mu
-          lftp -c "
-            set net:max-retries 2; set net:timeout 30; set sftp:auto-confirm no;
-            set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
-            open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
-            get \"${SFTP_DIR}wp-content/mu-plugins/gd-system-plugin/includes/cli/class-cache.php\" -o /tmp/mu/cli-cache.php;
-            get \"${SFTP_DIR}wp-content/mu-plugins/gd-system-plugin/includes/cache/class-v2-manager.php\" -o /tmp/mu/v2.php;
-            bye" 2>/tmp/inspect.err || true
-          esc() { sed 's/%/%25/g' | tr '\r\n' ' ¶' | cut -c1-3900; }
-          nocomment() { grep -vE '^[[:space:]]*(\*|/\*\*|\*/)'; }
-          echo "::notice::cli flush: $(sed -n '25,130p' /tmp/mu/cli-cache.php | nocomment | esc)"
-          echo "::notice::cli flush 2: $(sed -n '130,200p' /tmp/mu/cli-cache.php | nocomment | esc)"
-          echo "::notice::v2 methods: $(grep -nE '(public|private|protected).*function' /tmp/mu/v2.php | esc)"
-          echo "::notice::v2 ban/flush_cdn: $(grep -nE -A14 'function (ban|do_ban|flush_cdn)[ (]' /tmp/mu/v2.php | head -75 | esc)"
-          echo "::notice::lftp: $(tail -n 3 /tmp/inspect.err | esc)"
-
       - name: Upload changed files
         if: ${{ (github.event_name == 'push' && vars.DEPLOY_LIVE == 'true') || (github.event_name == 'workflow_dispatch' && !inputs.check_only) }}
         env:
@@ -181,6 +154,23 @@ jobs:
         run: |
           echo "Check passed. Nothing uploaded. Set the DEPLOY_LIVE variable to true to go live."
 
-      - name: Reminder
+      # Clears GoDaddy's page cache and CDN so the changes show straight away.
+      # The site only allows this once per new build (see wp-content/mu-plugins/zakaliya-static.php).
+      - name: Refresh GoDaddy's cache
         if: ${{ (github.event_name == 'push' && vars.DEPLOY_LIVE == 'true') || (github.event_name == 'workflow_dispatch' && !inputs.check_only) }}
-        run: echo "Uploaded. Now flush GoDaddy's cache - Managed WordPress > Settings > Tools > Flush Cache."
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://zakaliyasbm-mn.com' }}
+        run: |
+          expected=$(cat _site/build-id.txt)
+          for attempt in 1 2 3 4 5; do
+            served=$(curl -s --max-time 20 "$SITE_URL/build-id.txt?nocache=$RANDOM$attempt" | tr -d "[:space:]")
+            [ "$served" = "$expected" ] && break
+            echo "Waiting for the new files to be served (attempt $attempt)..."; sleep 10
+          done
+          result=$(curl -s --max-time 60 -X POST -w " HTTP %{http_code}" "$SITE_URL/?zakaliya-refresh=1")
+          echo "Cache refresh: $result"
+          if echo "$result" | grep -q '"flushed":true'; then
+            echo "::notice::GoDaddy cache refreshed: $result"
+          else
+            echo "::warning::Automatic cache refresh did not run ($result). Flush it by hand: Managed WordPress > Settings > Tools > Flush Cache."
+          fi

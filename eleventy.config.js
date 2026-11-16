@@ -69,7 +69,12 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addGlobalData("projects", loadProjects);
   eleventyConfig.addGlobalData("detailProjects", () => loadProjects().filter((p) => p.detail_page));
   eleventyConfig.addGlobalData("verses", () => readYaml(path.join(__dirname, "content", "verses.yml")));
-  eleventyConfig.addGlobalData("build", () => ({ year: String(new Date().getFullYear()), date: new Date().toISOString().slice(0, 10) }));
+  // build.id changes on every build; the deploy uses it to refresh GoDaddy's cache exactly once per upload
+  eleventyConfig.addGlobalData("build", () => {
+    const now = new Date();
+    const sha = (process.env.GITHUB_SHA || "local").slice(0, 12);
+    return { year: String(now.getFullYear()), date: now.toISOString().slice(0, 10), id: `${sha}-${now.getTime()}` };
+  });
   eleventyConfig.addWatchTarget("./content/");
 
   // Files copied as they are

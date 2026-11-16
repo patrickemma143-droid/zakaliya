@@ -15,6 +15,64 @@ if (is_admin() || (defined('DOING_AJAX') && DOING_AJAX) || (defined('DOING_CRON'
     return;
 }
 
+/**
+ * Automatic cache refresh after each upload (called by the GitHub deploy workflow:
+ * POST https://zakaliyasbm-mn.com/?zakaliya-refresh=1).
+ * Uses the same calls as GoDaddy's own "wp cache flush" command. It needs no password because it
+ * only flushes once per new build: every upload writes a new build-id.txt, and calls made for a
+ * build that was already refreshed do nothing.
+ */
+function zakaliya_refresh_cache()
+{
+    nocache_headers();
+    $file  = ABSPATH . 'build-id.txt';
+    $build = is_readable($file) ? trim((string) file_get_contents($file, false, null, 0, 200)) : '';
+    if ($build === '') {
+        wp_send_json(array('flushed' => false, 'reason' => 'no build id'), 200);
+    }
+    if (hash_equals((string) get_option('zakaliya_flushed_build', ''), $build)) {
+        wp_send_json(array('flushed' => false, 'reason' => 'already refreshed for this build', 'build' => $build), 200);
+    }
+    if (get_transient('zakaliya_flush_lock')) {
+        wp_send_json(array('flushed' => false, 'reason' => 'busy, try again shortly'), 429);
+    }
+    set_transient('zakaliya_flush_lock', 1, 30);
+
+    $cache = isset($GLOBALS['wpaas_cache_class']) ? $GLOBALS['wpaas_cache_class'] : null;
+    $steps = array();
+    try {
+        if ($cache && method_exists($cache, 'do_ban')) {          // page cache (Varnish)
+            $cache->do_ban();
+            $steps[] = 'page';
+        } elseif ($cache && method_exists($cache, 'ban')) {
+            $cache->ban();
+            $steps[] = 'page';
+        }
+        $platform = class_exists('\WPaaS\Hosting_API') && method_exists('\WPaaS\Hosting_API', 'is_available')
+            && \WPaaS\Hosting_API::is_available();
+        if ($platform) {
+            $steps[] = 'cdn (by platform)';                           // CDN flushed by GoDaddy itself
+        } elseif ($cache && method_exists($cache, 'flush_cdn')) {
+            $cache->flush_cdn();
+            $steps[] = 'cdn';
+        }
+    } catch (\Throwable $e) {
+        delete_transient('zakaliya_flush_lock');
+        wp_send_json(array('flushed' => false, 'reason' => 'cache error'), 500);
+    }
+    if (!$steps) {
+        delete_transient('zakaliya_flush_lock');
+        wp_send_json(array('flushed' => false, 'reason' => 'GoDaddy cache tools not found'), 500);
+    }
+    update_option('zakaliya_flushed_build', $build, false);
+    update_option('gd_system_last_cache_flush', time());
+    wp_send_json(array('flushed' => true, 'build' => $build, 'steps' => $steps), 200);
+}
+if (isset($_GET['zakaliya-refresh'])) {
+    add_action('init', 'zakaliya_refresh_cache', 999); // after GoDaddy's system plugin has loaded
+    return;
+}
+
 $zk_method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
 if ($zk_method !== 'GET' && $zk_method !== 'HEAD') {
     return; // POSTs (forms, payment notifications) go to WordPress untouched
