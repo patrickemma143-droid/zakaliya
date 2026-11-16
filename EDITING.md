@@ -1,7 +1,7 @@
 # Editing the website
 
 Editors sign in at **https://zakaliyasbm-mn.com/admin** (it opens the Pages CMS editor).
-Every save goes to GitHub, which rebuilds the site and uploads it to GoDaddy automatically
+Every save goes to GitHub, which rebuilds the site, uploads it to GoDaddy and clears GoDaddy's cache automatically
 (about 2 minutes). Every change is kept in the history and can be undone.
 
 ## One-time setup (admin, with the GitHub account that owns the repository)
@@ -32,7 +32,7 @@ The page layout and design are fixed in the code, so an edit can't break the des
 - **Photos:** upload JPG photos up to about 1–2 MB (phone photos are often 4–8 MB; most phones can share a smaller size). Always fill in **Describe the photo**.
 - **Bold text:** in text boxes with a toolbar, select words and click **B**.
 - **New progress update:** open the project → **Progress updates** → add one and drag it to the top.
-- If a change doesn't appear after 5 minutes, flush GoDaddy's cache (Managed WordPress → Settings → Tools → Flush Cache).
+- If a change doesn't appear after 5 minutes, refresh the page (Ctrl + F5). If it still doesn't, flush GoDaddy's cache by hand (Managed WordPress → Settings → Tools → Flush Cache); the GitHub run will also show a warning in that case.
 
 ## For developers
 - Content lives in `content/` (YAML). Page templates are in `src/`. Editor forms are defined in `.pages.yml`.

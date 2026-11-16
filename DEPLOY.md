@@ -57,7 +57,7 @@ The site goes live **the moment the first upload finishes** (our `index.html` an
 ideally after the Stripe links are added.
 1. Run the check (push, or Run workflow with **Check only** ticked) and confirm it lists `wp-config.php`.
 2. Go live: add the variable `DEPLOY_LIVE` = `true`, then re-run the workflow (or push).
-3. Flush GoDaddy's cache: **Managed WordPress → Settings → Tools → Flush Cache → Flush Now**. Do this after every upload.
+3. GoDaddy's cache is cleared automatically after each upload (the run ends with "GoDaddy cache refreshed"). If the run shows a warning instead, flush it by hand: **Managed WordPress → Settings → Tools → Flush Cache → Flush Now**.
 4. Check: home page, `/about/` → About, `/donations/...` → Donate, a made-up address → "page has moved", padlock on https.
 
 **Undo:** upload the saved WordPress `.htaccess` again and delete our `index.html`; WordPress takes over again.
