@@ -63,10 +63,12 @@ ideally after the Stripe links are added.
 **Undo:** upload the saved WordPress `.htaccess` again and delete our `index.html`; WordPress takes over again.
 
 ## E. After going live
-- WordPress stays installed underneath (Managed WordPress doesn't allow removing it). Keep it updated and protect the admin login
-  with a strong password + two-step login. Once the GiveWP data is exported, `/wp-admin` can be locked in `.htaccess`.
+- WordPress stays installed underneath (Managed WordPress doesn't allow removing it). The website editor uses its login and
+  user accounts (`wp-content/mu-plugins/zakaliya-editor.php`), so **don't lock or remove `/wp-admin` or `wp-login.php`**.
+  Keep WordPress updated and protect administrator accounts with strong passwords. Editor setup: see `EDITING.md`.
 - Submit `https://zakaliyasbm-mn.com/sitemap.xml` in Google Search Console.
-- Stripe Payment Links must redirect to `https://zakaliyasbm-mn.com/thank-you.html`; paste the links into `assets/donate-links.js`.
+- Stripe Payment Links must redirect to `https://zakaliyasbm-mn.com/thank-you.html`; paste the links in the editor
+  (Donate page → Stripe donation links).
 
 ---
 

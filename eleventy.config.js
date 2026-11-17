@@ -1,5 +1,5 @@
 // Builds the Zakaliya website from the editable content in /content
-// (edited through Pages CMS) and the page templates in /src.
+// (edited in the website editor at /admin) and the page templates in /src.
 //   npm run build   -> writes the finished site to /_site
 //   npm start       -> local preview at http://localhost:8080
 const fs = require("fs");
@@ -63,7 +63,7 @@ function dimensions(src) {
 module.exports = function (eleventyConfig) {
   eleventyConfig.setNunjucksEnvironmentOptions({ autoescape: true, throwOnUndefined: false });
 
-  // Content from /content (YAML, edited in Pages CMS)
+  // Content from /content (YAML, edited in the website editor)
   eleventyConfig.addGlobalData("site", () => readYaml(path.join(__dirname, "content", "site.yml")));
   eleventyConfig.addGlobalData("pages", loadPages);
   eleventyConfig.addGlobalData("projects", loadProjects);
@@ -79,6 +79,8 @@ module.exports = function (eleventyConfig) {
 
   // Files copied as they are
   eleventyConfig.addPassthroughCopy({ assets: "assets" }, { filter: (p) => !/(^|[\\/])(donate-links\.js|SOURCES\.txt)$/.test(p) });
+  // The YAML reader the website editor uses in the browser
+  eleventyConfig.addPassthroughCopy({ "node_modules/js-yaml/dist/js-yaml.min.js": "assets/admin/js-yaml.min.js" });
   eleventyConfig.addPassthroughCopy(".htaccess");
   eleventyConfig.addPassthroughCopy("robots.txt");
   eleventyConfig.addPassthroughCopy("wp-content");

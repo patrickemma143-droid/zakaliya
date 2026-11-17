@@ -1,4 +1,5 @@
-# Website editor (Pages CMS: https://app.pagescms.org)
+# Website editor forms, used by the editor at zakaliyasbm-mn.com/admin (assets/admin/editor.js)
+# and readable by Pages CMS (https://app.pagescms.org) as a backup.
 # Defines every form editors see. Saving in the editor commits to GitHub,
 # which rebuilds the site and uploads it automatically.
 
