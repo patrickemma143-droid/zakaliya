@@ -43,7 +43,7 @@ jobs:
           npm ci --no-audit --no-fund > npm.log 2>&1 || { report "npm ci failed" npm.log; exit 1; }
           npx @11ty/eleventy > build.log 2>&1 || { report "Build failed" build.log; exit 1; }
           tail -n 3 build.log
-          test -f _site/index.html || { echo "::error::Build produced no index.html"; exit 1; }
+          test -f _site/pages/home.html || { echo "::error::Build produced no home page (pages/home.html)"; exit 1; }
 
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
