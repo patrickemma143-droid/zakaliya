@@ -12,12 +12,12 @@
   // Pages the content files appear on (for "View on website")
   var PAGE_URLS = {
     "content/pages/home.yml": "/",
-    "content/pages/about.yml": "/about-us.html",
-    "content/pages/projects.yml": "/projects.html",
-    "content/pages/donate.yml": "/donate.html",
-    "content/pages/contact.yml": "/contact.html",
-    "content/pages/thank-you.yml": "/thank-you.html",
-    "content/pages/not-found.yml": "/404.html",
+    "content/pages/about.yml": "/about",
+    "content/pages/projects.yml": "/projects",
+    "content/pages/donate.yml": "/donate",
+    "content/pages/contact.yml": "/contact",
+    "content/pages/thank-you.yml": "/thank-you",
+    "content/pages/not-found.yml": "/this-page-does-not-exist",
     "content/verses.yml": "/#verse-of-the-day",
     "content/site.yml": "/"
   };
@@ -422,7 +422,7 @@
       return;
     }
     var d = f.data;
-    var url = f.isNew ? null : (d.detail_page ? "/project-" + slug + ".html" : "/projects.html#" + slug);
+    var url = f.isNew ? null : (d.detail_page ? "/projects/" + slug : "/projects#" + slug);
     els.view.appendChild(pageHead(d.title || slug, f.isNew ? "New project. It appears on the website after you save." : null,
       [viewLink(url), h("button", { class: "zk-btn zk-btn-danger", type: "button", onclick: function () { removeEntry(it, path, f); } }, icon("trash"), "Remove")], back));
     els.view.appendChild(renderForm(def.fields || [], f, path));

@@ -53,21 +53,21 @@ repository **variable** `DEPLOY_LIVE` is `true` (GitHub → Settings → Secrets
 A manual run (Actions → Deploy via SFTP → Run workflow) is also check-only unless you untick **Check only**.
 Every upload is refused if `wp-config.php` is not in the target folder.
 
-The site goes live **the moment the first upload finishes** (our `index.html` and `.htaccess` take over), so pick a quiet time,
+The site goes live **the moment the first upload finishes** (our pages, `.htaccess` and the `zakaliya-static.php` must-use plugin take over), so pick a quiet time,
 ideally after the Stripe links are added.
 1. Run the check (push, or Run workflow with **Check only** ticked) and confirm it lists `wp-config.php`.
 2. Go live: add the variable `DEPLOY_LIVE` = `true`, then re-run the workflow (or push).
 3. GoDaddy's cache is cleared automatically after each upload (the run ends with "GoDaddy cache refreshed"). If the run shows a warning instead, flush it by hand: **Managed WordPress → Settings → Tools → Flush Cache → Flush Now**.
 4. Check: home page, `/about/` → About, `/donations/...` → Donate, a made-up address → "page has moved", padlock on https.
 
-**Undo:** upload the saved WordPress `.htaccess` again and delete our `index.html`; WordPress takes over again.
+**Undo:** upload the saved WordPress `.htaccess` again and delete `wp-content/mu-plugins/zakaliya-static.php`; WordPress takes over again.
 
 ## E. After going live
 - WordPress stays installed underneath (Managed WordPress doesn't allow removing it). The website editor uses its login and
   user accounts (`wp-content/mu-plugins/zakaliya-editor.php`), so **don't lock or remove `/wp-admin` or `wp-login.php`**.
   Keep WordPress updated and protect administrator accounts with strong passwords. Editor setup: see `EDITING.md`.
 - Submit `https://zakaliyasbm-mn.com/sitemap.xml` in Google Search Console.
-- Stripe Payment Links must redirect to `https://zakaliyasbm-mn.com/thank-you.html`; paste the links in the editor
+- Stripe Payment Links must redirect to `https://zakaliyasbm-mn.com/thank-you`; paste the links in the editor
   (Donate page → Stripe donation links).
 
 ---
@@ -89,3 +89,10 @@ ideally after the Stripe links are added.
    Only as a last resort, change `security: strict` to `security: loose` in `deploy-ftps.yml`.
 
 DNS is managed at **GoDaddy** (nameservers `ns03/ns04.domaincontrol.com`). As of 16 Nov 2026: A `@` → `160.153.0.42`, CNAME `www` → `@`, no MX/TXT records.
+
+## Page addresses
+Pages have clean addresses: `/`, `/about`, `/projects`, `/projects/<project>` (e.g. `/projects/farming`), `/contact`, `/donate`, `/thank-you`, and the editor at `/admin`.
+The build writes them to `_site/pages/` and `wp-content/mu-plugins/zakaliya-static.php` shows each one at its clean address
+(`npm start` does the same locally). Old addresses such as `/about-us.html` or `/project-farming.html` still open the right page and
+the browser then shows the clean address. Old WordPress addresses (`/about-2`, `/donations/...`) redirect via `.htaccess`.
+The deploy removes the old top-level `.html` copies from the server.

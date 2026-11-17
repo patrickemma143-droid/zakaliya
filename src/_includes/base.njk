@@ -7,10 +7,10 @@
 {%- endif -%}
 {%- set links = [
   { key: "home", url: "/", label: menu.home },
-  { key: "about", url: "/about-us.html", label: menu.about },
-  { key: "projects", url: "/projects.html", label: menu.projects },
-  { key: "contact", url: "/contact.html", label: menu.contact },
-  { key: "donate", url: "/donate.html", label: menu.donate }
+  { key: "about", url: "/about", label: menu.about },
+  { key: "projects", url: "/projects", label: menu.projects },
+  { key: "contact", url: "/contact", label: menu.contact },
+  { key: "donate", url: "/donate", label: menu.donate }
 ] -%}
 <!doctype html>
 <html lang="en">
@@ -25,6 +25,8 @@
   <title>{{ seo.title }}</title>
 {%- if canonical %}
   <link rel="canonical" href="https://zakaliyasbm-mn.com{{ canonical }}">
+  {#- Old addresses (/about-us.html, /index.html, /about/) still open the page; show the clean address instead #}
+  <script>(function(c){var p=location.pathname;if(p!==c&&history.replaceState&&(/\.html$/.test(p)||p===c+"/"))history.replaceState(null,"",c+location.search+location.hash)})({{ canonical | json | safe }});</script>
 {%- endif %}
   <link rel="icon" type="image/png" href="{{ site.logo }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">

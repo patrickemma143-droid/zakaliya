@@ -1,15 +1,15 @@
 ---
 layout: base.njk
-permalink: /about-us.html
+permalink: /pages/about.html
 navKey: about
 pageKey: about
-canonical: /about-us.html
+canonical: /about
 ---
 {%- from "macros.njk" import img, hl -%}
 {%- set p = pages.about -%}
     <section class="page-hero" aria-labelledby="page-title">
       <div class="wrap page-hero-inner">
-        <div class="page-hero-copy"><p class="section-kicker">{{ p.hero.kicker }}</p><h1 id="page-title">{{ hl(p.hero.title, p.hero.title_highlight) }}</h1><p>{{ p.hero.text }}</p><a class="button" href="/projects.html">{{ p.hero.button_label }}</a></div>
+        <div class="page-hero-copy"><p class="section-kicker">{{ p.hero.kicker }}</p><h1 id="page-title">{{ hl(p.hero.title, p.hero.title_highlight) }}</h1><p>{{ p.hero.text }}</p><a class="button" href="/projects">{{ p.hero.button_label }}</a></div>
 {%- if p.hero.image %}
         <figure class="about-photo">{{ img(p.hero.image, p.hero.image_alt, "", "") }}{% if p.hero.caption %}<figcaption>{{ p.hero.caption }}</figcaption>{% endif %}</figure>
 {%- endif %}
@@ -18,7 +18,7 @@ canonical: /about-us.html
     <section class="intro about-story" aria-labelledby="about-title">
       <div class="wrap intro-grid"><div><p class="section-kicker">{{ p.mission.kicker }}</p><h2 id="about-title">{{ p.mission.title }}</h2></div><div class="intro-copy">{{ p.mission.body | md | safe }}{% if p.mission.verse_text %}<div class="mission-verse"><blockquote>{{ p.mission.verse_text }}<cite>{{ p.mission.verse_ref }}</cite></blockquote></div>{% endif %}</div></div>
     </section>
-    <section class="founders" aria-labelledby="founders-title"><div class="wrap founders-grid">{% if p.founders.image %}<figure class="founders-photo">{{ img(p.founders.image, p.founders.image_alt) }}{% if p.founders.caption %}<figcaption>{{ p.founders.caption }}</figcaption>{% endif %}</figure>{% endif %}<div class="founders-copy"><h2 id="founders-title">{{ p.founders.title }}</h2>{{ p.founders.body | md | safe }}<a class="text-link founders-link" href="/projects.html">{{ p.founders.link_label }} <span aria-hidden="true">&rarr;</span></a></div></div></section>
+    <section class="founders" aria-labelledby="founders-title"><div class="wrap founders-grid">{% if p.founders.image %}<figure class="founders-photo">{{ img(p.founders.image, p.founders.image_alt) }}{% if p.founders.caption %}<figcaption>{{ p.founders.caption }}</figcaption>{% endif %}</figure>{% endif %}<div class="founders-copy"><h2 id="founders-title">{{ p.founders.title }}</h2>{{ p.founders.body | md | safe }}<a class="text-link founders-link" href="/projects">{{ p.founders.link_label }} <span aria-hidden="true">&rarr;</span></a></div></div></section>
 {%- if p.recognition.show %}
     <section class="recognition" aria-labelledby="recognition-title">
       <div class="wrap">
@@ -47,4 +47,4 @@ canonical: /about-us.html
     </section>
 {%- endif %}
     <section class="beliefs" aria-labelledby="beliefs-title"><div class="wrap beliefs-grid"><h2 id="beliefs-title">{{ p.values.title }}</h2><div class="belief-list">{% for v in p.values.items %}<article><h3>{{ v.title }}</h3><p>{{ v.text }}</p></article>{% endfor %}</div></div></section>
-    <section class="invitation" id="contact" aria-labelledby="invitation-title"><div class="wrap invitation-inner"><div><p class="section-kicker">{{ p.invitation.kicker }}</p><h2 id="invitation-title">{{ p.invitation.title }}</h2><p>{{ p.invitation.text }}</p></div><a class="button button-dark" href="/donate.html">{{ p.invitation.button_label }}</a></div></section>
+    <section class="invitation" id="contact" aria-labelledby="invitation-title"><div class="wrap invitation-inner"><div><p class="section-kicker">{{ p.invitation.kicker }}</p><h2 id="invitation-title">{{ p.invitation.title }}</h2><p>{{ p.invitation.text }}</p></div><a class="button button-dark" href="/donate">{{ p.invitation.button_label }}</a></div></section>

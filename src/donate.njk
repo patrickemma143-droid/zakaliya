@@ -1,9 +1,9 @@
 ---
 layout: base.njk
-permalink: /donate.html
+permalink: /pages/donate.html
 navKey: donate
 pageKey: donate
-canonical: /donate.html
+canonical: /donate
 extraCss: ["/assets/donate.css?v=1"]
 scriptsBefore: ["/assets/donate.js?v=2"]
 ---
@@ -21,7 +21,7 @@ scriptsBefore: ["/assets/donate.js?v=2"]
             <p class="give-note" data-give-note></p>
             <p class="give-secure"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>{{ p.hero.secure_note }}</p>
           </div>
-          <div class="hero-actions"><a class="button don-button" data-legacy-donate href="/contact.html">{{ p.hero.fallback_button_label }}</a><a class="text-link" href="/projects.html">{{ p.hero.link_label }} <span aria-hidden="true">&rarr;</span></a></div>
+          <div class="hero-actions"><a class="button don-button" data-legacy-donate href="/contact">{{ p.hero.fallback_button_label }}</a><a class="text-link" href="/projects">{{ p.hero.link_label }} <span aria-hidden="true">&rarr;</span></a></div>
         </div>
 {%- if p.hero.image %}
         <figure class="don-hero-media">{{ img(p.hero.image, p.hero.image_alt, "", "", true) }}</figure>
@@ -51,7 +51,7 @@ scriptsBefore: ["/assets/donate.js?v=2"]
           <h2 id="other-title">{{ p.other.title }}</h2>
           <p>{{ p.other.text }}</p>
         </div>
-        <a class="button button-dark" href="/contact.html">{{ p.other.button_label }}</a>
+        <a class="button button-dark" href="/contact">{{ p.other.button_label }}</a>
       </div>
     </section>
     {#- Stripe Payment Links from the editor. donate.js only accepts https://buy.stripe.com/ links. #}

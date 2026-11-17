@@ -1,10 +1,7 @@
 # Zakaliya Shared Blessings Ministry: zakaliyasbm-mn.com (static site)
 
-# Serve our index.html first, even if old WordPress files (index.php) are still on the server
-DirectoryIndex index.html index.php
-
 # Friendly "page not found" page
-ErrorDocument 404 /404.html
+ErrorDocument 404 /pages/404.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -14,15 +11,16 @@ ErrorDocument 404 /404.html
   RewriteCond %{HTTP_HOST} ^www\. [NC]
   RewriteRule ^/?(.*)$ https://zakaliyasbm-mn.com/$1 [L,R=301]
 
-  # Old WordPress addresses -> matching new pages (keeps old links and search results working)
+  # Old WordPress addresses -> the new clean addresses (keeps old links and search results working).
+  # The pages themselves (/about, /projects, /projects/farming, ...) are served by
+  # wp-content/mu-plugins/zakaliya-static.php from the /pages folder.
   RewriteRule ^home/?$ / [L,R=301]
-  RewriteRule ^(about|about-2)/?$ /about-us.html [L,R=301]
-  RewriteRule ^(contact|contact-3|join-us)/?$ /contact.html [L,R=301]
-  RewriteRule ^(projects01|services)/?$ /projects.html [L,R=301]
-  RewriteRule ^donation-confirmation/?$ /thank-you.html [L,R=301]
-  RewriteRule ^(donations|donations/.*|donation-failed|donate)/?$ /donate.html [L,R=301]
+  RewriteRule ^(about-2|about-us)/?$ /about [L,R=301]
+  RewriteRule ^(contact-3|join-us)/?$ /contact [L,R=301]
+  RewriteRule ^(projects01|services)/?$ /projects [L,R=301]
+  RewriteRule ^donation-confirmation/?$ /thank-you [L,R=301]
+  RewriteRule ^(donations|donations/.*|donation-failed)/?$ /donate [L,R=301]
   RewriteRule ^(blog|blog-post-title|my-account|my-cart|checkout|shop|donor-dashboard|terms|privacy)/?$ / [L,R=301]
-  RewriteRule ^(about-us|projects|contact|donate|thank-you)/?$ /$1.html [L,R=301]
 </IfModule>
 
 # Keep the deploy tool's bookkeeping file private

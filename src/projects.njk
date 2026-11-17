@@ -1,9 +1,9 @@
 ---
 layout: base.njk
-permalink: /projects.html
+permalink: /pages/projects.html
 navKey: projects
 pageKey: projects
-canonical: /projects.html
+canonical: /projects
 extraCss: ["/assets/project-detail.css?v=1"]
 scriptsAfter: ["/assets/project-gallery.js?v=1"]
 ---
@@ -11,7 +11,7 @@ scriptsAfter: ["/assets/project-gallery.js?v=1"]
 {%- set p = pages.projects -%}
 {%- set completed = projects | where("category", "completed") -%}
 {%- set ongoing = projects | where("category", "ongoing") -%}
-    <section class="page-hero projects-hero" aria-labelledby="page-title">{% if p.hero.image %}<div class="projects-hero-image">{{ img(p.hero.image, p.hero.image_alt, "", "", true) }}</div>{% endif %}<div class="wrap page-hero-inner"><div class="page-hero-copy"><p class="section-kicker">{{ p.hero.kicker }}</p><h1 id="page-title">{{ hl(p.hero.title, p.hero.title_highlight) }}</h1><p>{{ p.hero.text }}</p><a class="button" href="/contact.html">{{ p.hero.button_label }}</a></div></div></section>
+    <section class="page-hero projects-hero" aria-labelledby="page-title">{% if p.hero.image %}<div class="projects-hero-image">{{ img(p.hero.image, p.hero.image_alt, "", "", true) }}</div>{% endif %}<div class="wrap page-hero-inner"><div class="page-hero-copy"><p class="section-kicker">{{ p.hero.kicker }}</p><h1 id="page-title">{{ hl(p.hero.title, p.hero.title_highlight) }}</h1><p>{{ p.hero.text }}</p><a class="button" href="/contact">{{ p.hero.button_label }}</a></div></div></section>
     <nav class="project-index" aria-label="Project sections"><div class="wrap">{% if completed.length %}<a href="#completed-projects">{{ p.completed.index_label }} <span>{{ completed.length | pad2 }}</span></a>{% endif %}{% if ongoing.length %}<a href="#ongoing-projects">{{ p.ongoing.index_label }} <span>{{ ongoing.length | pad2 }}</span></a>{% endif %}</div></nav>
 {%- if completed.length %}
     <section class="project-status-section completed-projects" id="completed-projects" aria-labelledby="completed-title">
@@ -65,4 +65,4 @@ scriptsAfter: ["/assets/project-gallery.js?v=1"]
       </div>
     </section>
 {%- endif %}
-    <section class="invitation" id="contact" aria-labelledby="invitation-title"><div class="wrap invitation-inner"><div><p class="section-kicker">{{ p.invitation.kicker }}</p><h2 id="invitation-title">{{ p.invitation.title }}</h2><p>{{ p.invitation.text }}</p></div><a class="button button-dark" href="/donate.html">{{ p.invitation.button_label }}</a></div></section>
+    <section class="invitation" id="contact" aria-labelledby="invitation-title"><div class="wrap invitation-inner"><div><p class="section-kicker">{{ p.invitation.kicker }}</p><h2 id="invitation-title">{{ p.invitation.title }}</h2><p>{{ p.invitation.text }}</p></div><a class="button button-dark" href="/donate">{{ p.invitation.button_label }}</a></div></section>

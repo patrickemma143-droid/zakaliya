@@ -24,7 +24,7 @@ function loadProjects() {
       return {
         ...data,
         slug,
-        url: data.detail_page ? `/project-${slug}.html` : `/projects.html#${slug}`,
+        url: data.detail_page ? `/projects/${slug}` : `/projects#${slug}`,
         updates: data.updates || [],
         gallery: data.gallery || [],
         facts: data.facts || [],
@@ -76,6 +76,21 @@ module.exports = function (eleventyConfig) {
     return { year: String(now.getFullYear()), date: now.toISOString().slice(0, 10), id: `${sha}-${now.getTime()}` };
   });
   eleventyConfig.addWatchTarget("./content/");
+
+  // Pages are built into /pages and shown at clean addresses (/about, /projects/farming).
+  // On the live site wp-content/mu-plugins/zakaliya-static.php does this; here the local preview does the same.
+  eleventyConfig.setServerOptions({
+    middleware: [(req, res, next) => {
+      const [p, q = ""] = req.url.split("?");
+      let m, to = null;
+      if (p === "/" || p === "/index.html") to = "/pages/home.html";
+      else if ((m = /^\/(about|projects|contact|donate|thank-you)\/?$/.exec(p))) to = `/pages/${m[1]}.html`;
+      else if ((m = /^\/projects\/([a-z0-9-]+)\/?$/.exec(p))) to = `/pages/projects/${m[1]}.html`;
+      else if (/^\/(admin|editor|login)\/?$/.test(p)) to = "/pages/editor.html";
+      if (to) req.url = to + (q ? "?" + q : "");
+      next();
+    }],
+  });
 
   // Files copied as they are
   eleventyConfig.addPassthroughCopy({ assets: "assets" }, { filter: (p) => !/(^|[\\/])(donate-links\.js|SOURCES\.txt)$/.test(p) });

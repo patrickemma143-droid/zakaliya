@@ -149,6 +149,36 @@ jobs:
             bye"
           # Uploads only the built site (_site). No --delete: Managed WordPress keeps its own files in the same folder.
 
+      # The pages now live in /pages and are shown at clean addresses (/about, /projects/farming).
+      # Remove the old copies at the top of the site folder (fixed names only) so they can't be opened as
+      # separate pages; the old addresses keep working through wp-content/mu-plugins/zakaliya-static.php.
+      - name: Remove old .html pages
+        if: ${{ (github.event_name == 'push' && vars.DEPLOY_LIVE == 'true') || (github.event_name == 'workflow_dispatch' && !inputs.check_only) }}
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST || vars.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT || vars.SFTP_PORT }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME || vars.SFTP_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_DIR: ${{ secrets.SFTP_DIR || vars.SFTP_DIR }}
+        run: |
+          # Old project pages are found by name (project-<name>.html) in the site folder only
+          olds="index.html about-us.html projects.html contact.html donate.html thank-you.html 404.html editor.html"
+          projects=$(lftp -c "
+            set net:max-retries 2; set net:timeout 30; set sftp:auto-confirm no;
+            set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
+            open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
+            cls -1 \"$SFTP_DIR\"; bye" | sed 's|.*/||' | grep -E '^project-[a-z0-9-]+\.html$' || true)
+          cmds=""
+          dir="${SFTP_DIR%/}/"
+          for f in $olds $projects; do cmds="$cmds rm -f \"$dir$f\";"; done
+          lftp -c "
+            set net:max-retries 2; set net:timeout 30; set sftp:auto-confirm no; set cmd:fail-exit no;
+            set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
+            open --env-password -u \"$SFTP_USERNAME\" -p \"${SFTP_PORT:-22}\" sftp://$SFTP_HOST;
+            $cmds
+            bye"
+          echo "Removed old copies (if they were still there): $olds $projects"
+
       - name: Not live yet
         if: ${{ github.event_name == 'push' && vars.DEPLOY_LIVE != 'true' }}
         run: |

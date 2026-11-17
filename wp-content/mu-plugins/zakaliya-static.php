@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Zakaliya static site
- * Description: Serves the static Zakaliya website (index.html, 404.html) in front of WordPress,
+ * Description: Serves the static Zakaliya website (pages/*.html) at clean addresses in front of WordPress,
  *              redirects old WordPress addresses, and sends www to the main domain.
  *              GoDaddy Managed WordPress can't remove WordPress, so this hands normal page
  *              visits to the static site while leaving wp-admin, login, the API and payment
@@ -97,22 +97,18 @@ if (strpos($zk_host, 'www.') === 0) {
     exit;
 }
 
-// Old WordPress addresses -> new pages
+// Old WordPress addresses -> the new clean addresses (zakaliyasbm-mn.com/about, /projects, ...)
 $zk_redirects = array(
     '#^/home/?$#i'                                   => '/',
-    '#^/(about|about-2)/?$#i'                        => '/about-us.html',
-    '#^/(contact|contact-3|join-us)/?$#i'            => '/contact.html',
-    '#^/(projects01|services)/?$#i'                  => '/projects.html',
-    '#^/donation-confirmation/?$#i'                  => '/thank-you.html',
-    '#^/(donations(/.*)?|donation-failed|donate)/?$#i' => '/donate.html',
+    '#^/(about-2|about-us)/?$#i'                     => '/about',
+    '#^/(contact-3|join-us)/?$#i'                    => '/contact',
+    '#^/(projects01|services)/?$#i'                  => '/projects',
+    '#^/donation-confirmation/?$#i'                  => '/thank-you',
+    '#^/(donations(/.*)?|donation-failed)/?$#i'      => '/donate',
     '#^/(blog|blog-post-title|my-account|my-cart|checkout|shop|donor-dashboard|terms|privacy)/?$#i' => '/',
-    '#^/(about-us|projects|contact|thank-you)/?$#i'  => null, // handled below (adds .html)
 );
 foreach ($zk_redirects as $zk_pattern => $zk_target) {
-    if (preg_match($zk_pattern, $zk_path, $zk_m)) {
-        if ($zk_target === null) {
-            $zk_target = '/' . strtolower($zk_m[1]) . '.html';
-        }
+    if (preg_match($zk_pattern, $zk_path)) {
         header('Location: ' . $zk_site . $zk_target, true, 301);
         exit;
     }
@@ -120,7 +116,7 @@ foreach ($zk_redirects as $zk_pattern => $zk_target) {
 
 function zakaliya_serve_static($file, $status)
 {
-    $full = ABSPATH . $file; // fixed file names only, never from the request
+    $full = ABSPATH . $file; // fixed file names, or a project name checked against [a-z0-9-] below
     if (!is_readable($full)) {
         return;
     }
@@ -140,20 +136,36 @@ function zakaliya_serve_static($file, $status)
     exit;
 }
 
-// Website editor sign-in page: zakaliyasbm-mn.com/admin (also /edit, /editor, /login)
-if (preg_match('#^/(admin|edit|editor|login)/?$#i', $zk_path)) {
+// The built pages live in /pages (pages/about.html, pages/projects/farming.html, ...) and are shown at
+// clean addresses. Old addresses (/about-us.html, /project-farming.html, /about/) still open the same
+// page, which then shows the clean address in the browser (no redirect, so browsers that remembered
+// the old /about -> /about-us.html redirect can't end up in a loop).
+
+// Website editor: zakaliyasbm-mn.com/admin (also /edit, /editor, /login, /editor.html)
+if (preg_match('#^/(admin|edit|editor|login)/?$|^/editor\.html$#i', $zk_path)) {
     header('X-Robots-Tag: noindex, nofollow');
-    zakaliya_serve_static('editor.html', 200);
+    zakaliya_serve_static('pages/editor.html', 200);
 }
 
-// Home page: our index.html (only plain "/" with no query, so WordPress callbacks like /?give-listener=... still work)
-if (($zk_path === '/' || $zk_path === '/index.php') && $zk_query === '') {
-    zakaliya_serve_static('index.html', 200);
+// Home page (only plain "/" with no query, so WordPress callbacks like /?give-listener=... still work)
+if ((($zk_path === '/' || $zk_path === '/index.php') && $zk_query === '') || $zk_path === '/index.html') {
+    zakaliya_serve_static('pages/home.html', 200);
+}
+
+// Main pages: /about, /projects, /contact, /donate, /thank-you
+if (preg_match('#^/(about|about-us|projects|contact|donate|thank-you)(/|\.html)?$#', $zk_path, $zk_m)) {
+    zakaliya_serve_static('pages/' . ($zk_m[1] === 'about-us' ? 'about' : $zk_m[1]) . '.html', 200);
+}
+
+// Project pages: /projects/farming (old address: /project-farming.html)
+if (preg_match('#^/projects/([a-z0-9][a-z0-9-]{0,80})/?$#', $zk_path, $zk_m)
+    || preg_match('#^/project-([a-z0-9][a-z0-9-]{0,80})\.html$#', $zk_path, $zk_m)) {
+    zakaliya_serve_static('pages/projects/' . $zk_m[1] . '.html', 200);
 }
 
 // Any page WordPress can't find: our 404 page instead of the old theme's
 add_action('template_redirect', function () {
     if (is_404()) {
-        zakaliya_serve_static('404.html', 404);
+        zakaliya_serve_static('pages/404.html', 404);
     }
 }, 0);

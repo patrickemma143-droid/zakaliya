@@ -1,6 +1,7 @@
 ---
 layout: base.njk
-permalink: /thank-you.html
+permalink: /pages/thank-you.html
+canonical: /thank-you
 pageKey: thank_you
 noindex: true
 extraCss: ["/assets/donate.css?v=1"]
@@ -12,7 +13,7 @@ extraCss: ["/assets/donate.css?v=1"]
         <div class="don-hero-copy">
           <h1 id="ty-title">{{ hl(p.title, p.title_highlight) }}</h1>
           {{ p.body | md | safe }}
-          <div class="hero-actions"><a class="button" href="/projects.html">{{ p.button_label }}</a><a class="text-link" href="/contact.html">{{ p.link_label }} <span aria-hidden="true">&rarr;</span></a></div>
+          <div class="hero-actions"><a class="button" href="/projects">{{ p.button_label }}</a><a class="text-link" href="/contact">{{ p.link_label }} <span aria-hidden="true">&rarr;</span></a></div>
         </div>
       </div>
     </section>

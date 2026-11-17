@@ -4,9 +4,9 @@ eleventyExcludeFromCollections: true
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-{%- set urls = ["/", "/about-us.html", "/projects.html"] %}
-{%- for pr in detailProjects %}{% set urls = urls.concat(["/project-" + pr.slug + ".html"]) %}{% endfor %}
-{%- set urls = urls.concat(["/donate.html", "/contact.html"]) %}
+{%- set urls = ["/", "/about", "/projects"] %}
+{%- for pr in detailProjects %}{% set urls = urls.concat(["/projects/" + pr.slug]) %}{% endfor %}
+{%- set urls = urls.concat(["/donate", "/contact"]) %}
 {%- for u in urls %}
   <url><loc>https://zakaliyasbm-mn.com{{ u }}</loc><lastmod>{{ build.date }}</lastmod></url>
 {%- endfor %}
