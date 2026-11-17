@@ -126,10 +126,12 @@ function zakaliya_serve_static($file, $status)
         http_response_code($status);
     }
     header('Content-Type: text/html; charset=utf-8');
-    // An explicit short lifetime: without max-age, GoDaddy's gateway tells browsers to keep pages for 31 days,
-    // so returning visitors would not see edits. Browsers now check for a newer page after 2 minutes.
-    header('Cache-Control: public, max-age=120, must-revalidate');
-    header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 120) . ' GMT');
+    // GoDaddy's gateway tells browsers to keep pages for 31 days unless the page says "never store"
+    // (any shorter lifetime is replaced), so returning visitors would not see edits for weeks. Pages are
+    // small; photos, styles and scripts still come from the CDN with long caching (their addresses change
+    // when they change).
+    header('Cache-Control: no-cache, must-revalidate, max-age=0, no-store, private');
+    header('Expires: Wed, 11 Jan 1984 05:00:00 GMT');
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('X-Frame-Options: SAMEORIGIN');
