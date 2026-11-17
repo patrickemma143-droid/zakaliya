@@ -30,5 +30,7 @@ eleventyExcludeFromCollections: true
   <script>window.ZK_EDITOR = {{ { "ajax": "/wp-admin/admin-ajax.php", "logo": site.logo, "siteName": site.name } | json | safe }};</script>
   <script src="/assets/admin/js-yaml.min.js?v=4.3.2"></script>
   <script src="/assets/admin/editor.js?v={{ build.id }}"></script>
+  {#- Same freshness check as the website pages (GoDaddy makes browsers keep pages for 31 days) #}
+  <script>(function(b){try{if(!window.fetch||!window.sessionStorage)return;fetch("/build-id.txt?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():""}).then(function(t){t=String(t).trim();if(!/^[\w-]{6,80}$/.test(t)||t===b)return;var k="zk-fresh-"+t+location.pathname;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");var go=function(){location.reload()};fetch(location.href,{cache:"reload",credentials:"same-origin"}).then(go,go)}).catch(function(){})}catch(e){}})({{ build.id | json | safe }});</script>
 </body>
 </html>

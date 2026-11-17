@@ -73,5 +73,8 @@
 {%- for js in scriptsAfter or [] %}
   <script src="{{ js }}" defer></script>
 {%- endfor %}
+  {#- GoDaddy makes browsers keep pages for 31 days. If this copy is older than the website's latest build,
+      fetch the fresh page and reload once, so returning visitors (and phones) always see the latest edits. #}
+  <script>(function(b){try{if(!window.fetch||!window.sessionStorage)return;fetch("/build-id.txt?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():""}).then(function(t){t=String(t).trim();if(!/^[\w-]{6,80}$/.test(t)||t===b)return;var k="zk-fresh-"+t+location.pathname;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");var go=function(){location.reload()};fetch(location.href,{cache:"reload",credentials:"same-origin"}).then(go,go)}).catch(function(){})}catch(e){}})({{ build.id | json | safe }});</script>
 </body>
 </html>

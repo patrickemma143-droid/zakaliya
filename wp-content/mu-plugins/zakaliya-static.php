@@ -126,12 +126,10 @@ function zakaliya_serve_static($file, $status)
         http_response_code($status);
     }
     header('Content-Type: text/html; charset=utf-8');
-    // GoDaddy's gateway tells browsers to keep pages for 31 days unless the page says "never store"
-    // (any shorter lifetime is replaced), so returning visitors would not see edits for weeks. Pages are
-    // small; photos, styles and scripts still come from the CDN with long caching (their addresses change
-    // when they change).
-    header('Cache-Control: no-cache, must-revalidate, max-age=0, no-store, private');
-    header('Expires: Wed, 11 Jan 1984 05:00:00 GMT');
+    // Note: GoDaddy's gateway replaces this with its own 31-day browser cache for every page, whatever is
+    // sent here. Pages therefore check /build-id.txt when they open and reload once if they are outdated
+    // (see src/_includes/base.njk).
+    header('Cache-Control: no-cache, must-revalidate');
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('X-Frame-Options: SAMEORIGIN');
