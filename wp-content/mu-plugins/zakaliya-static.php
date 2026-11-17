@@ -147,8 +147,13 @@ if (preg_match('#^/(admin|edit|editor|login)/?$|^/editor\.html$#i', $zk_path)) {
     zakaliya_serve_static('pages/editor.html', 200);
 }
 
-// Home page (only plain "/" with no query, so WordPress callbacks like /?give-listener=... still work)
-if ((($zk_path === '/' || $zk_path === '/index.php') && $zk_query === '') || $zk_path === '/index.html') {
+// Home page. Links with tracking tags (/?fbclid=..., /?utm_source=..., /?ref=...) also get our home page;
+// only WordPress's own technical requests (donation callbacks, previews, search, feeds, API) go to WordPress.
+$zk_wp_keys = array('give-listener', 'give_action', 'give-api', 'give_form_id', 'wc-api', 'rest_route', 'p', 'page_id',
+    'preview', 'preview_id', 's', 'feed', 'doing_wp_cron', 'action', 'author', 'cat', 'tag', 'attachment_id', 'pagename', 'name');
+parse_str($zk_query, $zk_query_vars);
+$zk_wp_request = (bool) array_intersect_key($zk_query_vars, array_flip($zk_wp_keys));
+if ((($zk_path === '/' || $zk_path === '/index.php') && !$zk_wp_request) || $zk_path === '/index.html') {
     zakaliya_serve_static('pages/home.html', 200);
 }
 
