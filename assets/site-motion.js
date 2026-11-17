@@ -46,6 +46,10 @@
   function start() {
     if (started) return;
     started = true;
+    // From here on GSAP controls the hero text. Mark it so the CSS "hidden until GSAP is ready" rule never
+    // applies again: when a phone is rotated or its browser bar resizes the page, matchMedia resets the
+    // animations, and without this mark the hero text would stay hidden.
+    gsap.utils.toArray(HERO_COPY).forEach(function (el) { el.classList.add("motion-ready"); });
     var mm = gsap.matchMedia();
 
     mm.add({

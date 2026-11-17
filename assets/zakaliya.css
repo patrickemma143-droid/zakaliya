@@ -634,6 +634,45 @@
 
 /* Site-wide GSAP motion (assets/site-motion.js). The hero copy waits hidden for
    GSAP; an inline fallback in index.html un-hides it if GSAP never loads. Each page has the same fallback. */
-.js-anim :is(.hero-copy, .page-hero-copy, .ct-form-wrap, .don-hero-copy, .pd-hero-copy) { visibility: hidden; }
+.js-anim :is(.hero-copy, .page-hero-copy, .ct-form-wrap, .don-hero-copy, .pd-hero-copy):not(.motion-ready) { visibility: hidden; }
 .js-anim .hero-copy > * { animation: none !important; opacity: 1; }
 .split-line { padding-bottom: .06em; }
+
+/* ---------- Phone polish (readable text, comfortable tap targets, nothing wider than the screen) ---------- */
+@media (max-width: 640px) {
+  /* Header name: readable on small phones */
+  .brand-name { max-width: 172px; font-size: 11px; letter-spacing: .05em; }
+  .brand-place { font-size: 10px; letter-spacing: .08em; }
+  /* Small labels */
+  .eyebrow, .section-kicker, .pj-slide-stage, .home-project-status { font-size: 11px; }
+  /* Links with arrows ("See our projects ->", "View project details"): at least 44px tall to tap */
+  .text-link { min-height: 44px; font-size: 12px; }
+  .pj-project-copy .pj-detail-link { min-height: 44px; margin-top: 8px; font-size: 14px; }
+  .pd-hero .pd-status { font-size: 11px; }
+  .ct-details dd a { display: inline-block; padding-block: 10px; }
+  .ct-social a { display: inline-flex; min-height: 44px; align-items: center; }
+  .video-link { min-height: 44px; font-size: 12px; }
+  .hp-link { min-height: 44px; }
+  .project-index a span, .upcoming-list span { font-size: 11px; }
+  body .pd-facts dt, body .pd-update-stage, body .pd-other p { font-size: 11px; }
+  .footer-nav a { font-size: 12px; }
+  /* Donate photo: keep the yellow frame inside the screen */
+  .don-hero-media::before { inset: 16px -10px -10px 16px; }
+}
+/* Projects page: photo on top, text underneath (side by side is too narrow on phones) */
+@media (max-width: 560px) {
+  .pj-project-row.pj-horizontal { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 12px 12px 18px; }
+  .pj-project-row.pj-horizontal .pj-project-media { grid-column: 1; grid-row: 1; min-height: 0; }
+  .pj-project-row.pj-horizontal .pj-project-media > img,
+  .pj-project-row.pj-horizontal .pj-slides { min-height: 0; aspect-ratio: 16 / 11; }
+  .pj-project-row.pj-horizontal .pj-project-copy { grid-column: 1; grid-row: 2; padding: 0 4px; }
+  .pj-project-row.pj-horizontal .project-status { gap: 8px; font-size: 11px; letter-spacing: .1em; }
+  .pj-project-row.pj-horizontal .pj-project-copy h3 { font-size: 23px; }
+  .pj-project-row.pj-horizontal .pj-project-copy > p:not(.project-status) { font-size: 15px; line-height: 1.65; }
+  .pj-project-row.pj-horizontal .pj-gallery-controls { align-items: center; flex-direction: row; justify-content: space-between; }
+  .pj-project-row.pj-horizontal .pj-gallery-buttons button { min-height: 44px; padding-inline: 14px; }
+}
+@media (max-width: 380px) {
+  .brand-name { max-width: 150px; font-size: 10.5px; letter-spacing: .04em; }
+  .brand-place { font-size: 10px; }
+}
