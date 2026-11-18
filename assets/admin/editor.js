@@ -143,7 +143,7 @@
       return r.text().then(function (t) { return answer(r.status, t); });
     }, function (e) {
       if (e && e.data) throw e;
-      var n = new Error("Could not reach the editor service. Check your internet connection and try again."); n.data = {}; throw n;
+      var n = new Error("Could not reach the editor service. Check your internet connection and try again. If it keeps happening, the website admin should check that the \"editor\" function is deployed in Supabase (see EDITING.md)."); n.data = {}; throw n;
     });
   }
 
