@@ -23,6 +23,8 @@ WordPress is not used by the editor.
 
 ### 2. Lock down sign-in
 1. **Authentication → Sign In / Providers**: make sure **Email** is enabled, and turn **off** "Allow new users to sign up". Save.
+   The editor checks this: while sign-up is on, it refuses to save anything ("The editor is locked..."), because every
+   Supabase account can edit the website.
 2. **Authentication → URL Configuration**:
    - **Site URL:** `https://zakaliyasbm-mn.com/admin`
    - **Redirect URLs:** add `https://zakaliyasbm-mn.com/admin`

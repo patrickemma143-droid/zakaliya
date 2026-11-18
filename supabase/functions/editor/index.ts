@@ -90,6 +90,21 @@ async function currentUser(req) {
   return user;
 }
 
+// Safety lock: every signed-in Supabase user may edit, so the editor refuses to work while anyone can
+// create an account (Authentication > Sign In / Providers > "Allow new users to sign up" must be off).
+let signupCheck = { at: 0, open: true };
+async function signupIsClosed(apikey) {
+  if (Date.now() - signupCheck.at < 60000) return !signupCheck.open;
+  let open = true;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/settings`, { headers: { apikey } });
+    const s = res.ok ? await res.json() : null;
+    open = !(s && s.disable_signup === true);
+  } catch (_e) { open = true; }
+  signupCheck = { at: Date.now(), open };
+  return !open;
+}
+
 function displayName(user) {
   const m = user.user_metadata || {};
   // The repository is public, so the email address is never written into the history.
@@ -271,6 +286,10 @@ Deno.serve(async (req) => {
     if (req.method !== "POST") throw new Fail(405, "Use POST.");
     if (!ALLOWED_ORIGINS.includes(origin)) throw new Fail(403, "The editor can only be used from the Zakaliya website.");
     const user = await currentUser(req);
+    if (!(await signupIsClosed(Deno.env.get("SUPABASE_ANON_KEY") || req.headers.get("apikey") || ""))) {
+      throw new Fail(503, "The editor is locked because anyone can still create an account. The website admin must turn off " +
+        "\"Allow new users to sign up\" in Supabase (Authentication > Sign In / Providers), then try again in a minute.");
+    }
     if (!TOKEN) throw new Fail(503, "The editor is not connected to GitHub yet. Add the GITHUB_TOKEN secret in Supabase (see EDITING.md).");
     let body;
     try { body = await req.json(); } catch (_e) { throw new Fail(400, "The request was not understood."); }
