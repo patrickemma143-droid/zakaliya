@@ -5,30 +5,28 @@ Every save goes to GitHub, which rebuilds the site, uploads it to GoDaddy and cl
 (about 2 minutes; the editor shows "Live on the website" when it's done). Every change is kept in the history and can be undone.
 
 How it fits together:
-- **Sign-in and accounts:** Supabase (free plan). Public sign-up is switched off: only people the admin adds can sign in.
+- **Sign-in and accounts:** Supabase (free plan), email + password.
+- **Who may edit:** only emails listed in the `website_editors` table in Supabase. Anyone else who manages to sign in is refused.
 - **The editor:** `assets/admin/editor.js` (the page at /admin). Its forms are built from `.pages.yml`.
-- **Saving:** the Supabase Edge Function `editor` (`supabase/functions/editor/index.ts`) checks the sign-in and commits the
-  changed files to GitHub with an access key that only Supabase knows.
+- **Saving:** database functions in the same Supabase project (`supabase/editor-setup.sql`) check the person is on the list
+  and commit the changed files to GitHub with an access key kept in Supabase **Vault** (encrypted).
 - **Public settings:** `editor-config.json` holds the Supabase project address and its *publishable* key (both are meant to be public).
   Never put the secret / service_role key there.
 
 WordPress is not used by the editor.
 
-## One-time setup (admin, about 15 minutes)
+## One-time setup (admin, about 10 minutes)
 
 ### 1. Create the Supabase project
-1. Go to https://supabase.com → **Start your project** → sign up (signing in with GitHub is easiest).
-2. **New project**: name `zakaliya-editor`, choose a strong database password (save it in your password manager; the editor
-   doesn't need it), pick the region closest to the editors, **Free** plan → **Create new project**.
+Already done: `https://cdmdzfyzbokvqjmfkdin.supabase.co` (its address and publishable key are in `editor-config.json`).
+For a new project: https://supabase.com → **New project**, Free plan, then put its Project URL and publishable key
+(**Project Settings → API Keys**) into `editor-config.json`.
 
-### 2. Lock down sign-in
-1. **Authentication → Sign In / Providers**: make sure **Email** is enabled, and turn **off** "Allow new users to sign up". Save.
-   The editor checks this: while sign-up is on, it refuses to save anything ("The editor is locked..."), because every
-   Supabase account can edit the website.
-2. **Authentication → URL Configuration**:
-   - **Site URL:** `https://zakaliyasbm-mn.com/admin`
-   - **Redirect URLs:** add `https://zakaliyasbm-mn.com/admin`
-   (Password-reset emails send people back to the editor.)
+### 2. Sign-in settings
+1. **Authentication → Sign In / Providers**: make sure **Email** is enabled. Turning **off** "Allow new users to sign up" is
+   recommended (strangers then can't even create an account; they could never edit anyway, because only listed emails can).
+2. **Authentication → URL Configuration**: **Site URL** `https://zakaliyasbm-mn.com/admin`, and add the same address under
+   **Redirect URLs** (password-reset emails send people back to the editor).
 
 ### 3. Create the GitHub access key
 1. On github.com (signed in as the repository owner): profile picture → **Settings** → **Developer settings** → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**.
@@ -37,31 +35,30 @@ WordPress is not used by the editor.
 4. **Permissions** → **Repository permissions** → **Contents: Read and write**. Leave everything else as it is.
 5. **Generate token** and copy it (it starts with `github_pat_`). Don't paste it anywhere else: not in chat, email or a file.
 
-### 4. Add the saving function
-1. Supabase → **Edge Functions → Secrets** → add a secret named `GITHUB_TOKEN` with the key from step 3 → **Save**.
-2. **Edge Functions → Deploy a new function → Via Editor**. Name it exactly `editor`.
-3. Replace the sample code with the whole of `supabase/functions/editor/index.ts`
-   (on github.com open that file → **Raw** → select all → copy) → **Deploy function**.
-4. Open the `editor` function → **Details / Settings** → turn **off** "Enforce JWT verification" (also called "Verify JWT")
-   → **Save**. The function checks the sign-in itself; this setting would otherwise block the browser.
+### 4. Put the key in Supabase Vault
+Easiest: **Integrations → Vault → Add new secret** (or **Project Settings → Vault**). **Name:** `github_token`, **Secret:** the key → Save.
+(Or in the SQL Editor: `select vault.create_secret('github_pat_...', 'github_token');` then delete that query from the editor's history.)
+To renew it later, edit the `github_token` secret and paste the new key.
 
-### 5. Connect the website
-**Project Settings → API Keys** (or the **Connect** button): copy the **Project URL** (`https://xxxx.supabase.co`) and the
-**publishable** key (`sb_publishable_...`, or the older "anon public" key). Put them in `editor-config.json` (or send them to
-your developer). Both are public. **Never** share the *secret* / *service_role* key.
+### 5. Run the setup script
+**SQL Editor → New query** → paste the whole of `supabase/editor-setup.sql`
+(on github.com open that file → **Raw** → select all → copy) → **Run**. It should end with "Success".
+It's safe to run again after an update; it keeps the list of editors.
 
-To renew the GitHub key later: create a new one (step 3) and replace the `GITHUB_TOKEN` secret (step 4.1).
+### 6. Add yourself as the first editor (next section).
 
 ## Give someone access
-1. Supabase → **Authentication → Users → Add user → Create new user**.
-2. Enter their **email** and a strong **password**, tick **Auto Confirm User** → **Create user**.
-3. Send them the email address and password privately (in person, by phone or SMS; not in a public group).
-4. Optional, to show their name in the editor and in the history (instead of "Editor 1a2b3c"):
-   **SQL Editor** → run (with their email):
-   `update auth.users set raw_user_meta_data = raw_user_meta_data || '{"name":"Grace"}' where email = 'grace@example.com';`
+Two things: a sign-in account, and their email on the list of editors.
 
-To remove someone: **Users** → the **⋯** menu on their row → **Delete user** (they're signed out within the hour and can't save
-from that moment). To reset a password: **⋯** → **Send password recovery**, or delete and add them again.
+1. **Account:** **Authentication → Users → Add user → Create new user** → their email and a strong password,
+   tick **Auto Confirm User** → **Create user**.
+2. **On the list:** **SQL Editor** → run (with their email and the name to show in the history):
+   `insert into public.website_editors (email, name) values (lower('grace@example.com'), 'Grace');`
+3. Send them the email address and password privately (in person, by phone or SMS; not in a public group).
+
+To remove someone: `delete from public.website_editors where email = lower('grace@example.com');` (they can't save from that
+moment), and delete their account under **Authentication → Users** (**⋯** → **Delete user**).
+To see the list: `select * from public.website_editors;`
 Editors can change their own password in the editor (round initials button → **Change my password**) and can use
 **Forgot your password?** on the sign-in page.
 
@@ -102,6 +99,6 @@ open the commit → **⋯** → **Revert** (or ask a developer), which publishes
   editor at `/admin` reads (Pages CMS can still read it too).
 - `npm install` then `npm start` for a local preview at http://localhost:8080; `npm run build` writes `_site/`.
 - The deploy workflow builds `_site/` and uploads only that folder (see `DEPLOY.md`).
-- Editor API: POST to `<Supabase URL>/functions/v1/editor` with the signed-in user's token; actions `load`, `upload`, `save`.
-  Saves may only touch `content/site.yml`, `content/verses.yml`, existing `content/pages/*.yml`, `content/projects/*.yml`
-  and new photos in `assets/uploads/`. Calls are only accepted from https://zakaliyasbm-mn.com (and localhost for testing).
+- Editor API: `POST <Supabase URL>/rest/v1/rpc/editor_load | editor_upload | editor_save` with the signed-in user's token
+  (functions in `supabase/editor-setup.sql`). Saves may only touch `content/site.yml`, `content/verses.yml`, existing
+  `content/pages/*.yml`, `content/projects/*.yml` and new photos in `assets/uploads/`.

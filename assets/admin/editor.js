@@ -1,7 +1,7 @@
 /* Zakaliya website editor.
  * Signing in: Supabase (email + password; editors are added in the Supabase dashboard).
  * Forms: built from .pages.yml, the same definitions Pages CMS uses.
- * Saving: the Supabase function "editor" (supabase/functions/editor/index.ts) commits the changed
+ * Saving: database functions in the same Supabase project (supabase/editor-setup.sql) commit the changed
  * content files to GitHub, which rebuilds and uploads the site. */
 (function () {
   "use strict";
@@ -108,10 +108,18 @@
 
   /* ---------------------------------------------------------------- server */
 
-  // Sign-in is handled by Supabase (email + password); saving by the Supabase function "editor"
-  // (supabase/functions/editor/index.ts), which holds the GitHub key.
+  // Sign-in is handled by Supabase (email + password). Loading and saving go through database functions
+  // in the same Supabase project (supabase/editor-setup.sql), which check the person is on the list of
+  // editors and talk to GitHub with the key kept in Supabase Vault.
   var sb = null;
-  function fnUrl() { return String(CFG.supabaseUrl).replace(/\/+$/, "") + "/functions/v1/editor"; }
+  var RPC = { load: "editor_load", upload: "editor_upload", save: "editor_save" };
+  function rpcUrl(action) { return String(CFG.supabaseUrl).replace(/\/+$/, "") + "/rest/v1/rpc/" + RPC[action]; }
+  function rpcBody(action, data) {
+    data = data || {};
+    if (action === "upload") return { p_name: data.name || "photo", p_data: data.data || "" };
+    if (action === "save") return { p_changes: data.changes || [], p_deletes: data.deletes || [], p_uploads: data.uploads || [], p_summary: data.summary || "" };
+    return {};
+  }
 
   function token() {
     return sb.auth.getSession().then(function (r) {
@@ -121,30 +129,70 @@
     });
   }
 
+  // Turns the database's answer into either the result or an error with a plain message
   function answer(status, text) {
     var j = null;
     try { j = JSON.parse(text); } catch (e) { /* not JSON */ }
-    if (!j) {
-      var e0 = new Error("The editor service gave an unexpected answer (HTTP " + status + "). Please try again.");
-      e0.data = {}; throw e0;
+    if (status >= 200 && status < 300 && j && j.ok) return j;
+    var data = {}, msg = "Something went wrong. Please try again.";
+    if (j && typeof j === "object") {
+      var code = String(j.code || "");
+      msg = j.message || j.msg || j.error || msg;
+      if (code === "ZK401" || status === 401 || code === "PGRST301" || code === "PGRST303") { data.signin = true; msg = "Your session has ended. Please sign in again."; }
+      else if (code === "ZK409") { data.conflict = j.hint || true; }
+      else if (code === "PGRST202" || code === "42883" || code === "3F000" || code === "42P01") {
+        msg = "The editor isn't fully set up in Supabase yet. The website admin needs to run supabase/editor-setup.sql in the SQL Editor (see EDITING.md).";
+      } else if (code === "57014") { msg = "GitHub took too long to answer. Please try again."; }
+    } else {
+      msg = "The editor service gave an unexpected answer (HTTP " + status + "). Please try again.";
     }
-    if (!j.ok) { var err = new Error(j.error || "Something went wrong."); err.data = j; err.status = status; throw err; }
-    return j;
+    var err = new Error(msg); err.data = data; err.status = status; throw err;
   }
 
   function api(action, data) {
     return token().then(function (t) {
-      return fetch(fnUrl(), {
+      return fetch(rpcUrl(action), {
         method: "POST", cache: "no-store",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + t, apikey: CFG.supabaseKey },
-        body: JSON.stringify(Object.assign({ action: action }, data || {}))
+        body: JSON.stringify(rpcBody(action, data))
       });
     }).then(function (r) {
       return r.text().then(function (t) { return answer(r.status, t); });
     }, function (e) {
       if (e && e.data) throw e;
-      var n = new Error("Could not reach the editor service. Check your internet connection and try again. If it keeps happening, the website admin should check that the \"editor\" function is deployed in Supabase (see EDITING.md)."); n.data = {}; throw n;
+      var n = new Error("Could not reach the editor service. Check your internet connection and try again. If nobody has used the editor for over a week, the website admin may need to wake it up (Supabase dashboard > Restore project)."); n.data = {}; throw n;
     });
+  }
+
+  // Git's version id of a text file, so the next save of the same page isn't mistaken for a conflict
+  function gitBlobId(text) {
+    var body = new TextEncoder().encode(text);
+    var head = new TextEncoder().encode("blob " + body.length + "\0");
+    var all = new Uint8Array(head.length + body.length);
+    all.set(head); all.set(body, head.length);
+    return crypto.subtle.digest("SHA-1", all).then(function (d) {
+      return Array.prototype.map.call(new Uint8Array(d), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+    });
+  }
+
+  // The database sends the repository as GitHub describes it; turn it into files and photos
+  function unpackRepository(repo) {
+    var files = {}, images = [];
+    var yaml = /\.ya?ml$/, img = /\.(jpe?g|png|webp|gif)$/i;
+    ((repo.content && repo.content.entries) || []).forEach(function (e) {
+      var p = "content/" + e.name;
+      if (e.type === "blob" && yaml.test(e.name) && e.object && typeof e.object.text === "string") files[p] = { text: e.object.text, oid: e.oid };
+      else if (e.type === "tree" && e.object && e.object.entries) e.object.entries.forEach(function (c) {
+        if (c.type === "blob" && yaml.test(c.name) && c.object && typeof c.object.text === "string") files[p + "/" + c.name] = { text: c.object.text, oid: c.oid };
+      });
+    });
+    ((repo.assets && repo.assets.entries) || []).forEach(function (e) {
+      if (e.type === "blob" && img.test(e.name)) images.push("/assets/" + e.name);
+      else if (e.type === "tree" && e.object && e.object.entries) e.object.entries.forEach(function (c) {
+        if (c.type === "blob" && img.test(c.name)) images.push("/assets/" + e.name + "/" + c.name);
+      });
+    });
+    return { schema: repo.schema.text, files: files, images: images };
   }
 
   function readBase64(file) {
@@ -160,7 +208,7 @@
     return Promise.all([token(), readBase64(file)]).then(function (v) {
       return new Promise(function (resolve, reject) {
         var x = new XMLHttpRequest();
-        x.open("POST", fnUrl());
+        x.open("POST", rpcUrl("upload"));
         x.setRequestHeader("Content-Type", "application/json");
         x.setRequestHeader("Authorization", "Bearer " + v[0]);
         x.setRequestHeader("apikey", CFG.supabaseKey);
@@ -169,7 +217,7 @@
           try { resolve(answer(x.status, x.responseText)); } catch (e) { reject(e); }
         };
         x.onerror = function () { reject(new Error("The upload was interrupted. Check your internet connection and try again.")); };
-        x.send(JSON.stringify({ action: "upload", name: file.name, data: v[1] }));
+        x.send(JSON.stringify(rpcBody("upload", { name: file.name, data: v[1] })));
       });
     });
   }
@@ -242,7 +290,9 @@
   function openEditor(user) {
     S.user = { name: personName(user), email: (user && user.email) || "" };
     bootMessage(CFG.siteName || "Zakaliya", "Opening the website editor...");
-    api("load").then(function (d) {
+    api("load").then(function (res) {
+      var d = unpackRepository(res.repository || {});
+      if (res.name && res.name !== "Website editor") S.user.name = res.name;
       S.schema = Y.load(d.schema) || {};
       S.components = S.schema.components || {};
       S.images = (d.images || []).slice().sort();
@@ -1229,11 +1279,17 @@
     els.saveBtn.disabled = true;
     els.saveBtn.textContent = "Saving...";
     setStatus("saving", "Saving...");
+    var saved = null;
     api("save", { changes: changes, deletes: [], uploads: uploads, summary: summary }).then(function (res) {
+      saved = res;
+      // New version ids of the saved files, so the next save of the same page isn't seen as a conflict
+      return Promise.all(changes.map(function (c) { return gitBlobId(c.text).then(function (id) { c.newOid = id; }); }));
+    }).then(function () {
+      var res = saved;
       changes.forEach(function (c) {
         var f = S.files[c.path];
         f.text = c.text;
-        f.oid = (res.oids && res.oids[c.path]) || f.oid;
+        f.oid = c.newOid || f.oid;
         f.dirty = false;
         f.isNew = false;
       });
