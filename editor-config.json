@@ -1,0 +1,5 @@
+{
+  "_comment": "Website editor sign-in (Supabase). Both values are public (safe in the website): Supabase dashboard > Project Settings > API (or Connect). Never put the service_role / secret key here.",
+  "supabaseUrl": "",
+  "supabaseKey": ""
+}

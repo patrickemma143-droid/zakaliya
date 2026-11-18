@@ -27,7 +27,8 @@ eleventyExcludeFromCollections: true
     </div>
   </div>
   <noscript><p class="zk-noscript">The website editor needs JavaScript. Please turn it on in your browser.</p></noscript>
-  <script>window.ZK_EDITOR = {{ { "ajax": "/wp-admin/admin-ajax.php", "logo": site.logo, "siteName": site.name } | json | safe }};</script>
+  <script>window.ZK_EDITOR = {{ { "supabaseUrl": editorConfig.supabaseUrl, "supabaseKey": editorConfig.supabaseKey, "logo": site.logo, "siteName": site.name } | json | safe }};</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="/assets/admin/js-yaml.min.js?v=4.3.2"></script>
   <script src="/assets/admin/editor.js?v={{ build.id }}"></script>
   {#- Same freshness check as the website pages (GoDaddy makes browsers keep pages for 31 days) #}

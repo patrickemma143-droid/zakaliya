@@ -163,6 +163,8 @@ jobs:
         run: |
           # Old project pages are found by name (project-<name>.html) in the site folder only
           olds="index.html about-us.html projects.html contact.html donate.html thank-you.html 404.html editor.html"
+          # The editor used to sign in through WordPress; it now uses Supabase, so the old plugin is removed too
+          olds="$olds wp-content/mu-plugins/zakaliya-editor.php assets/admin/login.css"
           projects=$(lftp -c "
             set net:max-retries 2; set net:timeout 30; set sftp:auto-confirm no;
             set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';

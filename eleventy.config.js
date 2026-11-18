@@ -69,6 +69,8 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addGlobalData("projects", loadProjects);
   eleventyConfig.addGlobalData("detailProjects", () => loadProjects().filter((p) => p.detail_page));
   eleventyConfig.addGlobalData("verses", () => readYaml(path.join(__dirname, "content", "verses.yml")));
+  // Website editor sign-in (Supabase): public project address and key
+  eleventyConfig.addGlobalData("editorConfig", () => JSON.parse(fs.readFileSync(path.join(__dirname, "editor-config.json"), "utf8")));
   // build.id changes on every build; the deploy uses it to refresh GoDaddy's cache exactly once per upload
   eleventyConfig.addGlobalData("build", () => {
     const now = new Date();

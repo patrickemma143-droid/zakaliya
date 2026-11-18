@@ -1,11 +1,12 @@
 /* Zakaliya website editor.
- * Signing in: WordPress (wp-content/mu-plugins/zakaliya-editor.php).
+ * Signing in: Supabase (email + password; editors are added in the Supabase dashboard).
  * Forms: built from .pages.yml, the same definitions Pages CMS uses.
- * Saving: the server commits the changed content files to GitHub, which rebuilds and uploads the site. */
+ * Saving: the Supabase function "editor" (supabase/functions/editor/index.ts) commits the changed
+ * content files to GitHub, which rebuilds and uploads the site. */
 (function () {
   "use strict";
 
-  var CFG = window.ZK_EDITOR || { ajax: "/wp-admin/admin-ajax.php" };
+  var CFG = window.ZK_EDITOR || {}; // supabaseUrl, supabaseKey (public values from editor-config.json), logo, siteName
   var Y = window.jsyaml;
   var app = document.getElementById("app");
 
@@ -107,42 +108,69 @@
 
   /* ---------------------------------------------------------------- server */
 
-  function post(action, fields) {
-    var fd = new FormData();
-    fd.append("action", "zakaliya_" + action);
-    if (S.session && S.session.nonce) fd.append("_nonce", S.session.nonce);
-    Object.keys(fields || {}).forEach(function (k) { fd.append(k, fields[k]); });
-    return fetch(CFG.ajax, { method: "POST", body: fd, credentials: "same-origin", cache: "no-store" })
-      .then(function (r) {
-        return r.text().then(function (t) {
-          var j = null;
-          try { j = JSON.parse(t); } catch (e) { /* not JSON */ }
-          if (!j) throw new Error("The website gave an unexpected answer (HTTP " + r.status + "). Please try again.");
-          if (j.signin && S.session) { location.href = S.session.loginUrl; }
-          if (!j.ok) { var err = new Error(j.error || "Something went wrong."); err.data = j; err.status = r.status; throw err; }
-          return j;
-        });
+  // Sign-in is handled by Supabase (email + password); saving by the Supabase function "editor"
+  // (supabase/functions/editor/index.ts), which holds the GitHub key.
+  var sb = null;
+  function fnUrl() { return String(CFG.supabaseUrl).replace(/\/+$/, "") + "/functions/v1/editor"; }
+
+  function token() {
+    return sb.auth.getSession().then(function (r) {
+      var s = r && r.data && r.data.session;
+      if (!s) { var e = new Error("Your session has ended. Please sign in again."); e.data = { signin: true }; throw e; }
+      return s.access_token;
+    });
+  }
+
+  function answer(status, text) {
+    var j = null;
+    try { j = JSON.parse(text); } catch (e) { /* not JSON */ }
+    if (!j) {
+      var e0 = new Error("The editor service gave an unexpected answer (HTTP " + status + "). Please try again.");
+      e0.data = {}; throw e0;
+    }
+    if (!j.ok) { var err = new Error(j.error || "Something went wrong."); err.data = j; err.status = status; throw err; }
+    return j;
+  }
+
+  function api(action, data) {
+    return token().then(function (t) {
+      return fetch(fnUrl(), {
+        method: "POST", cache: "no-store",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + t, apikey: CFG.supabaseKey },
+        body: JSON.stringify(Object.assign({ action: action }, data || {}))
       });
+    }).then(function (r) {
+      return r.text().then(function (t) { return answer(r.status, t); });
+    }, function (e) {
+      if (e && e.data) throw e;
+      var n = new Error("Could not reach the editor service. Check your internet connection and try again."); n.data = {}; throw n;
+    });
+  }
+
+  function readBase64(file) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader();
+      fr.onload = function () { resolve(String(fr.result).replace(/^data:[^,]*,/, "")); };
+      fr.onerror = function () { reject(new Error("Could not read that photo.")); };
+      fr.readAsDataURL(file);
+    });
   }
 
   function uploadFile(file, onProgress) {
-    return new Promise(function (resolve, reject) {
-      var fd = new FormData();
-      fd.append("action", "zakaliya_upload");
-      fd.append("_nonce", S.session.nonce);
-      fd.append("file", file, file.name);
-      var x = new XMLHttpRequest();
-      x.open("POST", CFG.ajax);
-      x.withCredentials = true;
-      x.upload.onprogress = function (e) { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
-      x.onload = function () {
-        var j = null;
-        try { j = JSON.parse(x.responseText); } catch (e) { /* ignore */ }
-        if (j && j.ok) resolve(j);
-        else reject(new Error((j && j.error) || "The upload failed (HTTP " + x.status + "). Please try again."));
-      };
-      x.onerror = function () { reject(new Error("The upload was interrupted. Check your internet connection and try again.")); };
-      x.send(fd);
+    return Promise.all([token(), readBase64(file)]).then(function (v) {
+      return new Promise(function (resolve, reject) {
+        var x = new XMLHttpRequest();
+        x.open("POST", fnUrl());
+        x.setRequestHeader("Content-Type", "application/json");
+        x.setRequestHeader("Authorization", "Bearer " + v[0]);
+        x.setRequestHeader("apikey", CFG.supabaseKey);
+        x.upload.onprogress = function (e) { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+        x.onload = function () {
+          try { resolve(answer(x.status, x.responseText)); } catch (e) { reject(e); }
+        };
+        x.onerror = function () { reject(new Error("The upload was interrupted. Check your internet connection and try again.")); };
+        x.send(JSON.stringify({ action: "upload", name: file.name, data: v[1] }));
+      });
     });
   }
 
@@ -151,8 +179,8 @@
     if (!/^image\/(jpeg|png|webp)$/.test(file.type) || !window.createImageBitmap) return Promise.resolve(file);
     if (file.type === "image/png" && file.size < 1500000) return Promise.resolve(file);
     return createImageBitmap(file, { imageOrientation: "from-image" }).then(function (bmp) {
+      // Always re-drawn, even small photos: this also removes hidden details such as the phone's GPS location
       var max = 2400, scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
-      if (scale === 1 && file.size < 1500000 && file.type === "image/jpeg") return file;
       var c = document.createElement("canvas");
       c.width = Math.round(bmp.width * scale);
       c.height = Math.round(bmp.height * scale);
@@ -181,37 +209,187 @@
 
   function start() {
     if (!Y) { bootMessage("The editor could not start", "A file did not load. Please reload the page."); return; }
-    post("session").then(function (s) {
-      if (!s.signedIn) { location.replace(s.loginUrl); return; }
-      S.session = s;
-      var signOut = h("a", { class: "zk-btn zk-btn-ghost", href: s.logoutUrl, text: "Sign out" });
-      if (!s.allowed) {
-        bootMessage("No editor access", "Your account can't edit the website. Ask the website admin to give you the \"Website editor\" role.", [signOut]);
-        return;
-      }
-      if (!s.configured) {
-        bootMessage("The editor isn't connected yet",
-          s.isAdmin ? "Add the GitHub access key under Settings > Website editor (see EDITING.md)." : "The website admin is still setting it up. Please try again later.",
-          [s.settingsUrl ? h("a", { class: "zk-btn", href: s.settingsUrl, text: "Open editor settings" }) : null, signOut]);
-        return;
-      }
-      return post("load").then(function (d) {
-        S.schema = Y.load(d.schema) || {};
-        S.components = S.schema.components || {};
-        S.images = (d.images || []).slice().sort();
-        Object.keys(d.files).forEach(function (p) {
-          S.files[p] = { text: d.files[p].text, oid: d.files[p].oid, data: parseYaml(d.files[p].text), dirty: false };
-        });
-        buildNav();
-        renderShell();
-        window.addEventListener("hashchange", route);
-        route();
+    if (!CFG.supabaseUrl || !CFG.supabaseKey) {
+      bootMessage("The editor isn't set up yet", "The website admin still needs to connect the sign-in service (see EDITING.md).");
+      return;
+    }
+    if (!window.supabase || !window.supabase.createClient) {
+      bootMessage("The editor could not start", "A file did not load. Please check your internet connection and reload the page.",
+        [h("button", { class: "zk-btn", type: "button", onclick: function () { location.reload(); }, text: "Reload" })]);
+      return;
+    }
+    // A "reset your password" email link opens /admin#access_token=...&type=recovery
+    var recovering = /(^|&|#)type=recovery(&|$)/.test(location.hash);
+    var linkError = /error_description=([^&]+)/.exec(location.hash);
+    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: "zakaliya-editor" }
+    });
+    sb.auth.getSession().then(function (r) {
+      var session = r && r.data && r.data.session;
+      if (recovering || linkError) history.replaceState(null, "", location.pathname);
+      if (linkError) { showLogin("That link has expired or was already used. Ask for a new one below.", "forgot"); return; }
+      if (recovering && session) { showSetPassword(); return; }
+      if (!session) { showLogin(); return; }
+      openEditor(session.user);
+    }).catch(function () { showLogin(); });
+  }
+
+  function personName(user) {
+    var m = (user && user.user_metadata) || {};
+    return String(m.name || m.full_name || m.display_name || (user && user.email) || "Editor");
+  }
+
+  function openEditor(user) {
+    S.user = { name: personName(user), email: (user && user.email) || "" };
+    bootMessage(CFG.siteName || "Zakaliya", "Opening the website editor...");
+    api("load").then(function (d) {
+      S.schema = Y.load(d.schema) || {};
+      S.components = S.schema.components || {};
+      S.images = (d.images || []).slice().sort();
+      Object.keys(d.files).forEach(function (p) {
+        S.files[p] = { text: d.files[p].text, oid: d.files[p].oid, data: parseYaml(d.files[p].text), dirty: false };
       });
+      buildNav();
+      renderShell();
+      window.addEventListener("hashchange", route);
+      route();
     }).catch(function (e) {
+      if (e.data && e.data.signin) { showLogin(e.message); return; }
       bootMessage("The editor could not open", e.message || "Please check your internet connection and reload.",
         [h("button", { class: "zk-btn", type: "button", onclick: function () { location.reload(); }, text: "Try again" }),
-         S.session ? h("a", { class: "zk-btn zk-btn-ghost", href: S.session.logoutUrl, text: "Sign out" }) : null]);
+         h("button", { class: "zk-btn zk-btn-ghost", type: "button", onclick: signOut, text: "Sign out" })]);
     });
+  }
+
+  function signOut() {
+    if (anyDirty() && !window.confirm("You have unsaved changes. Sign out anyway?")) return;
+    Object.keys(S.files).forEach(function (p) { S.files[p].dirty = false; });
+    var done = function () { location.replace(location.pathname); };
+    sb.auth.signOut().then(done, done);
+  }
+
+  // Supabase's messages, in plain words
+  function authError(err) {
+    var m = String((err && err.message) || "");
+    if (/invalid login credentials/i.test(m)) return "The email or password is incorrect.";
+    if (/email not confirmed/i.test(m)) return "This account hasn't been confirmed yet. Ask the website admin.";
+    if (/rate limit|too many|security purposes/i.test(m)) return "Too many attempts. Please wait a few minutes, then try again.";
+    if (/password should be|weak|at least/i.test(m)) return "Please choose a longer password (at least 8 characters, with letters and numbers).";
+    if (/same.*password|different from the old/i.test(m)) return "Please choose a password different from the old one.";
+    if (/fetch|network|failed to fetch|load failed/i.test(m)) return "Could not reach the sign-in service. Check your internet connection. If nobody has used the editor for over a week, the website admin may need to wake it up (Supabase dashboard > Restore project).";
+    return m || "Something went wrong. Please try again.";
+  }
+
+  function authCard(title, intro, body) {
+    app.className = "zk-boot";
+    app.textContent = "";
+    var card = h("div", { class: "zk-boot-card zk-auth" },
+      h("img", { src: CFG.logo || "/assets/logo.png", alt: "", width: 96, height: 58 }),
+      h("p", { class: "zk-auth-kicker", text: "Website editor" }),
+      h("h1", { class: "zk-auth-title", text: title }),
+      intro ? h("p", { class: "zk-boot-text", text: intro }) : null,
+      body,
+      h("a", { class: "zk-auth-back", href: "/" }, "← Back to the website"));
+    app.appendChild(card);
+    return card;
+  }
+
+  function field(label, input) {
+    return h("div", { class: "zk-field" }, h("label", { class: "zk-label", for: input.id, text: label }), input);
+  }
+
+  function showLogin(message, mode) {
+    document.title = "Sign in - Website editor";
+    var forgot = mode === "forgot";
+    var email = h("input", { class: "zk-input", type: "email", id: "zk-email", name: "email", autocomplete: "username", required: true, inputmode: "email", autocapitalize: "none", spellcheck: "false" });
+    var pass = forgot ? null : h("input", { class: "zk-input", type: "password", id: "zk-pass", name: "password", autocomplete: "current-password", required: true });
+    var msg = h("p", { class: "zk-auth-msg", role: "alert", hidden: !message, text: message || "" });
+    var btn = h("button", { class: "zk-btn zk-auth-submit", type: "submit", text: forgot ? "Send reset link" : "Sign in" });
+    var form = h("form", { class: "zk-auth-form", novalidate: true },
+      msg, field("Email", email), pass ? field("Password", pass) : null, btn,
+      h("button", { type: "button", class: "zk-auth-link", onclick: function () { showLogin(null, forgot ? null : "forgot"); },
+        text: forgot ? "Back to sign in" : "Forgot your password?" }));
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var em = email.value.trim();
+      if (!em || (pass && !pass.value)) { msg.textContent = "Please fill in your email" + (pass ? " and password." : "."); msg.hidden = false; msg.className = "zk-auth-msg"; return; }
+      btn.disabled = true;
+      btn.textContent = forgot ? "Sending..." : "Signing in...";
+      var done = function () { btn.disabled = false; btn.textContent = forgot ? "Send reset link" : "Sign in"; };
+      if (forgot) {
+        sb.auth.resetPasswordForEmail(em, { redirectTo: location.origin + "/admin" }).then(function (r) {
+          done();
+          if (r.error && /rate limit|security purposes/i.test(r.error.message)) { msg.textContent = authError(r.error); msg.className = "zk-auth-msg"; }
+          else { msg.textContent = "If that email has an editor account, a reset link is on its way. Check your inbox (and spam folder)."; msg.className = "zk-auth-msg is-ok"; }
+          msg.hidden = false;
+        }, function (err) { done(); msg.textContent = authError(err); msg.className = "zk-auth-msg"; msg.hidden = false; });
+        return;
+      }
+      sb.auth.signInWithPassword({ email: em, password: pass.value }).then(function (r) {
+        if (r.error || !r.data || !r.data.session) {
+          done(); msg.textContent = authError(r.error); msg.className = "zk-auth-msg"; msg.hidden = false; pass.select(); return;
+        }
+        openEditor(r.data.session.user);
+      }, function (err) { done(); msg.textContent = authError(err); msg.className = "zk-auth-msg"; msg.hidden = false; });
+    });
+    authCard(forgot ? "Reset your password" : "Sign in to edit the website",
+      forgot ? "Enter your email and we'll send you a link to choose a new password." : "Use the email and password the website admin gave you.",
+      form);
+    setTimeout(function () { email.focus(); }, 30);
+  }
+
+  function passwordForm(onDone, submitLabel) {
+    var p1 = h("input", { class: "zk-input", type: "password", id: "zk-new-pass", autocomplete: "new-password", required: true, minlength: 8 });
+    var p2 = h("input", { class: "zk-input", type: "password", id: "zk-new-pass2", autocomplete: "new-password", required: true, minlength: 8 });
+    var msg = h("p", { class: "zk-auth-msg", role: "alert", hidden: true });
+    var btn = h("button", { class: "zk-btn zk-auth-submit", type: "submit", text: submitLabel });
+    var form = h("form", { class: "zk-auth-form", novalidate: true }, msg,
+      field("New password (at least 8 characters)", p1), field("Type it again", p2), btn);
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      e.stopPropagation(); // when shown inside a dialog, don't also submit (and close) the dialog
+      var fail = function (t) { msg.textContent = t; msg.hidden = false; };
+      if (p1.value.length < 8) return fail("Please use at least 8 characters.");
+      if (p1.value !== p2.value) return fail("The two passwords don't match.");
+      btn.disabled = true;
+      sb.auth.updateUser({ password: p1.value }).then(function (r) {
+        btn.disabled = false;
+        if (r.error) return fail(authError(r.error));
+        onDone(r.data && r.data.user);
+      }, function (err) { btn.disabled = false; fail(authError(err)); });
+    });
+    return { form: form, focus: function () { p1.focus(); } };
+  }
+
+  function showSetPassword() {
+    document.title = "Choose a new password - Website editor";
+    var pf = passwordForm(function (user) { openEditor(user); setTimeout(function () { toast("Your new password is saved.", "ok"); }, 600); }, "Save password and open the editor");
+    authCard("Choose a new password", "You opened a password reset link. Choose a new password for your editor account.", pf.form);
+    setTimeout(pf.focus, 30);
+  }
+
+  function changePasswordDialog() {
+    toggleMenu(false);
+    var pf = passwordForm(function () { closeDialog(); toast("Your new password is saved.", "ok"); }, "Save new password");
+    dialog("Change my password", [pf.form], null, false, null);
+    setTimeout(pf.focus, 30);
+  }
+
+  // Session ended while editing: sign in again without losing unsaved changes
+  function signInAgainDialog() {
+    var email = h("input", { class: "zk-input", type: "email", id: "zk-re-email", autocomplete: "username", value: (S.user && S.user.email) || "" });
+    var pass = h("input", { class: "zk-input", type: "password", id: "zk-re-pass", autocomplete: "current-password" });
+    var msg = h("p", { class: "zk-auth-msg", role: "alert", hidden: true });
+    dialog("Please sign in again", [h("p", { text: "Your session ended. Sign in again; your unsaved changes are kept." }), msg,
+      field("Email", email), field("Password", pass)], "Sign in", false, function () {
+      sb.auth.signInWithPassword({ email: email.value.trim(), password: pass.value }).then(function (r) {
+        if (r.error) { msg.textContent = authError(r.error); msg.hidden = false; return; }
+        closeDialog();
+        toast("Signed in again. Click Save & publish to save your changes.", "ok");
+      });
+      return false; // keep the dialog open until signed in
+    });
+    setTimeout(function () { (email.value ? pass : email).focus(); }, 30);
   }
 
   function buildNav() {
@@ -243,7 +421,7 @@
   function renderShell() {
     app.className = "zk-app";
     app.textContent = "";
-    var s = S.session;
+    var s = S.user;
 
     els.nav = h("nav", { class: "zk-nav", "aria-label": "Editor sections" });
     els.sidebar = h("aside", { class: "zk-sidebar", id: "zk-sidebar" },
@@ -257,11 +435,10 @@
     els.status = h("div", { class: "zk-status", role: "status", "aria-live": "polite" });
     var initials = (s.name || "?").split(/\s+/).map(function (p) { return p.charAt(0); }).join("").slice(0, 2).toUpperCase();
     els.menu = h("div", { class: "zk-menu", role: "menu", hidden: true },
-      h("p", { class: "zk-menu-who" }, h("small", { text: "Signed in as" }), h("strong", { text: s.name })),
-      h("a", { role: "menuitem", href: s.profileUrl, text: "Change my password" }),
-      s.usersUrl ? h("a", { role: "menuitem", href: s.usersUrl, text: "Manage editors" }) : null,
-      s.settingsUrl ? h("a", { role: "menuitem", href: s.settingsUrl, text: "Editor settings" }) : null,
-      h("a", { role: "menuitem", href: s.logoutUrl, class: "zk-menu-out", text: "Sign out" }));
+      h("p", { class: "zk-menu-who" }, h("small", { text: "Signed in as" }), h("strong", { text: s.name }),
+        s.email && s.email !== s.name ? h("small", { class: "zk-menu-email", text: s.email }) : null),
+      h("button", { type: "button", role: "menuitem", onclick: changePasswordDialog, text: "Change my password" }),
+      h("button", { type: "button", role: "menuitem", class: "zk-menu-out", onclick: signOut, text: "Sign out" }));
     var accountBtn = h("button", { class: "zk-account", type: "button", "aria-haspopup": "menu", "aria-expanded": "false", "aria-label": "Account menu",
       onclick: function (e) { e.stopPropagation(); toggleMenu(); } }, h("span", { text: initials }));
     els.accountBtn = accountBtn;
@@ -297,7 +474,7 @@
     var open = force === undefined ? els.menu.hidden : force;
     els.menu.hidden = !open;
     els.accountBtn.setAttribute("aria-expanded", String(open));
-    if (open) { var first = els.menu.querySelector("a"); if (first) first.focus(); }
+    if (open) { var first = els.menu.querySelector("a,button"); if (first) first.focus(); }
   }
 
   function renderNav() {
@@ -481,7 +658,7 @@
       }
       setStatus("saving", "Removing...");
       S.saving = true;
-      post("save", { payload: JSON.stringify({ changes: [], deletes: [{ path: path, oid: f.oid }], uploads: [], summary: "remove project " + title }) })
+      api("save", { changes: [], deletes: [{ path: path, oid: f.oid }], uploads: [], summary: "remove project " + title })
         .then(function (res) {
           f.deleted = true;
           delete S.files[path];
@@ -879,7 +1056,8 @@
           toast("Photo added. Remember to describe it.", "ok");
         });
       }).catch(function (e) {
-        toast(e.message || "The upload failed.", "error");
+        if (e.data && e.data.signin) signInAgainDialog();
+        else toast(e.message || "The upload failed.", "error");
       }).then(function () {
         btn.disabled = false;
         label.textContent = "Upload photo";
@@ -1051,7 +1229,7 @@
     els.saveBtn.disabled = true;
     els.saveBtn.textContent = "Saving...";
     setStatus("saving", "Saving...");
-    post("save", { payload: JSON.stringify({ changes: changes, deletes: [], uploads: uploads, summary: summary }) }).then(function (res) {
+    api("save", { changes: changes, deletes: [], uploads: uploads, summary: summary }).then(function (res) {
       changes.forEach(function (c) {
         var f = S.files[c.path];
         f.text = c.text;
@@ -1083,8 +1261,8 @@
         location.reload();
         return true;
       });
-    } else if (e.data && e.data.reload) {
-      dialog("Please reload", [h("p", { text: e.message + " Copy any long text you typed first, so you can paste it back." })], "Reload", false, function () { location.reload(); return true; });
+    } else if (e.data && e.data.signin) {
+      signInAgainDialog();
     } else {
       toast(e.message || "Saving failed. Please try again.", "error");
     }

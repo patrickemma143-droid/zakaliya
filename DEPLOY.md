@@ -63,9 +63,8 @@ ideally after the Stripe links are added.
 **Undo:** upload the saved WordPress `.htaccess` again and delete `wp-content/mu-plugins/zakaliya-static.php`; WordPress takes over again.
 
 ## E. After going live
-- WordPress stays installed underneath (Managed WordPress doesn't allow removing it). The website editor uses its login and
-  user accounts (`wp-content/mu-plugins/zakaliya-editor.php`), so **don't lock or remove `/wp-admin` or `wp-login.php`**.
-  Keep WordPress updated and protect administrator accounts with strong passwords. Editor setup: see `EDITING.md`.
+- WordPress stays installed underneath (Managed WordPress doesn't allow removing it). Keep it updated and protect administrator accounts with strong passwords.
+  The website editor does not use WordPress (it signs in with Supabase; see `EDITING.md`).
 - Submit `https://zakaliyasbm-mn.com/sitemap.xml` in Google Search Console.
 - Stripe Payment Links must redirect to `https://zakaliyasbm-mn.com/thank-you`; paste the links in the editor
   (Donate page → Stripe donation links).
