@@ -52,9 +52,12 @@
     gsap.utils.toArray(HERO_COPY).forEach(function (el) { el.classList.add("motion-ready"); });
     var mm = gsap.matchMedia();
 
+    // GSAP only runs this when at least one condition matches, so phones need a condition of their own
+    // (with only "reduce" and "wide", nothing animated on phones).
     mm.add({
       reduce: "(prefers-reduced-motion: reduce)",
-      wide: "(min-width: 768px)"
+      wide: "(min-width: 768px)",
+      narrow: "(max-width: 767.98px)"
     }, function (ctx) {
       var c = ctx.conditions;
       if (c.reduce) { showAll(); return; }
@@ -83,11 +86,11 @@
         });
       }
 
-      /* Home hero photo drifts slowly as it scrolls away (desktop only) */
-      if (c.wide && document.querySelector(".hero-slide")) {
-        gsap.set(".hero-slide", { scale: 1.16 });
+      /* Home hero photo drifts slowly as it scrolls away (gentler on phones) */
+      if (document.querySelector(".hero-slide")) {
+        gsap.set(".hero-slide", { scale: c.wide ? 1.16 : 1.1 });
         gsap.to(".hero-slide", {
-          yPercent: 7, ease: "none",
+          yPercent: c.wide ? 7 : 5, ease: "none",
           scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true }
         });
       }
